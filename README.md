@@ -32,3 +32,7 @@ More details on how to replicate this repo is on the way.
 More details on the reason why we selected each and every idividual vulnerabitlies, and some statistical analysis can be found in the following file:
 
 Empirical_Updates.xlsx
+
+
+## Note
+

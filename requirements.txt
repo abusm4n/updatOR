@@ -1,2 +1,8 @@
 transformers==4.57.3
 torch==2.9.1
+datasets==4.4.2
+ipywidgets==8.1.8
+accelerate==1.12.0
+scikit-learn==1.8.0
+matplotlib==3.10.8
+seaborn==0.13.2
