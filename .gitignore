@@ -36,7 +36,7 @@ src/securebert-iot/
 src/cve_classifier_results/
 src/cve_classifier_model/
 src/models
-
+cvelistV5/
 
 # Ignore .csv files with potentially sensitive data
 # *.csv
