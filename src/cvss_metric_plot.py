@@ -147,6 +147,23 @@ def parse_vector_string_v2(vector_string):
     
     return metrics
 
+
+def normalize_impact(value):
+    """Normalize CVSS CIA impact values"""
+    if value is None:
+        return 'N/A'
+    v = str(value).upper()
+    if v in ['H', 'HIGH']:
+        return 'HIGH'
+    if v in ['L', 'LOW']:
+        return 'LOW'
+    if v in ['N', 'NONE']:
+        return 'NONE'
+    if v in ['M', 'MEDIUM']:
+        return 'MEDIUM'
+    return 'N/A'
+
+
 def extract_severity_from_cvss(cvss_data):
     """Extract severity level from CVSS data object"""
     severity = 'N/A'
@@ -295,7 +312,10 @@ def process_json_files(folder_path):
                             cvss_v3_files += 1
                         
                         # Update the frequency counters
+                        
                         for key, value in metrics.items():
+                            if key in ['Confidentiality', 'Integrity', 'Availability']:
+                                value = normalize_impact(value)
                             if key in frequency_counter:
                                 frequency_counter[key][value] += 1
             
@@ -327,6 +347,8 @@ def process_json_files(folder_path):
                                 
                                 # Update the frequency counters
                                 for key, value in metrics.items():
+                                    if key in ['Confidentiality', 'Integrity', 'Availability']:
+                                        value = normalize_impact(value)
                                     if key in frequency_counter:
                                         frequency_counter[key][value] += 1
             
@@ -594,7 +616,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
             bars1 = axes[0].bar(av_labels, av_values, color=['#FF6B6B', '#FFD166', '#06D6A0', '#118AB2'][:len(av_labels)])
             axes[0].set_title('Attack Vector Distribution', fontsize=14, fontweight='bold')
             axes[0].set_xlabel('Attack Vector', fontsize=12)
-            axes[0].set_ylabel('Count', fontsize=12)
+            axes[0].set_ylabel('#Vulnerabilities', fontsize=12)
             axes[0].tick_params(axis='x', rotation=45)
             axes[0].grid(True, alpha=0.3, axis='y')
             
@@ -650,7 +672,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
             bars2 = axes[1].bar(ac_labels, ac_values, color=colors)
             axes[1].set_title('Attack Complexity Distribution', fontsize=14, fontweight='bold')
             axes[1].set_xlabel('Attack Complexity', fontsize=12)
-            axes[1].set_ylabel('Count', fontsize=12)
+            axes[1].set_ylabel('#Vulnerabilities', fontsize=12)
             axes[1].grid(True, alpha=0.3, axis='y')
             
             for bar in bars2:
@@ -781,7 +803,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
                         bars = axes[idx].bar(level_labels, level_counts, color=colors, edgecolor='black')
                         axes[idx].set_title(f'{metric} Impact', fontsize=12, fontweight='bold')
                         axes[idx].set_xlabel('Impact Level', fontsize=10)
-                        axes[idx].set_ylabel('Count', fontsize=10)
+                        axes[idx].set_ylabel('#Vulnerabilities', fontsize=10)
                         axes[idx].grid(True, alpha=0.3, axis='y')
                         
                         for bar in bars:
@@ -1040,8 +1062,11 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
 # Main execution
 if __name__ == "__main__":
     # Folder containing the dataset
-    #dataset_folder = './data/both'
-    dataset_folder = './data/overall'
+    #dataset_folder = './data/sw'
+    #dataset_folder = './data/fw'
+    dataset_folder = './data/both'
+    #dataset_folder = './data/overall'
+
 
     
     # Process the JSON files and get the frequency counts
