@@ -617,7 +617,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
             axes[0].set_title('Attack Vector Distribution', fontsize=14, fontweight='bold')
             axes[0].set_xlabel('Attack Vector', fontsize=12)
             axes[0].set_ylabel('#Vulnerabilities', fontsize=12)
-            axes[0].tick_params(axis='x', rotation=45)
+            axes[0].tick_params(axis='x', rotation=0)
             axes[0].grid(True, alpha=0.3, axis='y')
             
             for bar in bars1:
@@ -925,7 +925,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
             bars = ax3.bar(list(av_filtered.keys()), list(av_filtered.values()))
             ax3.set_title('Attack Vector', fontweight='bold', fontsize=11)
             ax3.set_ylabel('Count', fontsize=9)
-            ax3.tick_params(axis='x', rotation=45)
+            ax3.tick_params(axis='x', rotation=0)
             ax3.grid(True, alpha=0.3, axis='y')
         else:
             ax3.text(0.5, 0.5, 'No Attack Vector Data', 
@@ -956,7 +956,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
         bars = ax4.bar(metric_names, metrics_stats, color='steelblue')
         ax4.set_title('Metrics Coverage (Total Entries)', fontweight='bold', fontsize=11)
         ax4.set_ylabel('Count', fontsize=9)
-        ax4.tick_params(axis='x', rotation=45)
+        ax4.tick_params(axis='x', rotation=0)
         ax4.grid(True, alpha=0.3, axis='y')
         
         for bar in bars:
@@ -1062,9 +1062,9 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
 # Main execution
 if __name__ == "__main__":
     # Folder containing the dataset
-    #dataset_folder = './data/sw'
+    dataset_folder = './data/sw'
     #dataset_folder = './data/fw'
-    dataset_folder = './data/both'
+    #dataset_folder = './data/both'
     #dataset_folder = './data/overall'
 
 

@@ -1,0 +1,321 @@
+## Both folder
+python ./src/cvss_metrics.py 
+============================================================
+CVSS METRICS ANALYSIS SUMMARY
+============================================================
+Searching for JSON files in './data/both' and subdirectories...
+Found 892 JSON files to process
+  Processed 100 files...
+  Processed 200 files...
+  Processed 300 files...
+  Processed 400 files...
+  Processed 500 files...
+  Processed 600 files...
+  Processed 700 files...
+  Processed 800 files...
+
+Processing Summary:
+Total JSON files found: 892
+Files successfully processed: 892
+Files containing CVSS metrics: 559
+Files with CVSS v2.0 metrics: 17
+Files with CVSS v3.x metrics: 528
+
+============================================================
+ALL METRICS DISTRIBUTION WITH PERCENTAGES
+============================================================
+
+Confidentiality:
+----------------------------------------
+  H: 362 (66.4%)
+  N: 110 (20.2%)
+  L: 57 (10.5%)
+  C: 11 (2.0%)
+  P: 5 (0.9%)
+  Total entries: 545
+
+Integrity:
+----------------------------------------
+  H: 357 (65.5%)
+  N: 92 (16.9%)
+  L: 80 (14.7%)
+  C: 11 (2.0%)
+  P: 5 (0.9%)
+  Total entries: 545
+
+Availability:
+----------------------------------------
+  H: 337 (61.8%)
+  N: 153 (28.1%)
+  L: 40 (7.3%)
+  C: 11 (2.0%)
+  P: 4 (0.7%)
+  Total entries: 545
+
+Attack Vector:
+----------------------------------------
+  N: 276 (50.6%)
+  L: 192 (35.2%)
+  A: 47 (8.6%)
+  P: 30 (5.5%)
+  Total entries: 545
+
+Attack Complexity:
+----------------------------------------
+  L: 419 (76.9%)
+  H: 126 (23.1%)
+  Total entries: 545
+
+Privileges Required:
+----------------------------------------
+  N: 257 (48.7%)
+  L: 174 (33.0%)
+  H: 97 (18.4%)
+  Total entries: 528
+
+User Interaction:
+----------------------------------------
+  N: 429 (81.2%)
+  R: 99 (18.8%)
+  Total entries: 528
+
+Scope:
+----------------------------------------
+  U: 446 (84.5%)
+  C: 82 (%)
+  Total entries: 528
+
+baseSeverity:
+----------------------------------------
+  N/A: 545 (100.0%)
+  Total entries: 545
+
+SeverityLevel:
+----------------------------------------
+  High: 243 (44.6%)
+  Medium: 222 (40.7%)
+  Critical: 61 (11.2%)
+  Low: 19 (3.5%)
+  Total entries: 545
+
+Authentication:
+----------------------------------------
+  M: 11 (64.7%)
+  S: 5 (29.4%)
+  N: 1 (5.9%)
+  Total entries: 17
+
+============================================================
+CIA TRIAD IMPACT LEVELS (Confidentiality, Integrity, Availability)
+============================================================
+
+Confidentiality:
+
+Integrity:
+
+Availability:
+
+============================================================
+ATTACK VECTOR DISTRIBUTION
+============================================================
+
+Attack Vector Breakdown:
+  NETWORK: 276 (50.6%)
+  ADJACENT_NETWORK: 47 (8.6%)
+  LOCAL: 192 (35.2%)
+  PHYSICAL: 30 (5.5%)
+
+============================================================
+SEVERITY LEVEL DISTRIBUTION (Critical/High/Medium/Low)
+============================================================
+
+Severity Levels:
+  Critical: 61 (11.2%)
+  High: 243 (44.6%)
+  Medium: 222 (40.7%)
+  Low: 19 (3.5%)
+
+============================================================
+BASE SEVERITY DISTRIBUTION (from CVSS baseSeverity field)
+============================================================
+
+Base Severity Levels:
+  N/A: 545 (100.0%)
+
+============================================================
+ATTACK COMPLEXITY DISTRIBUTION
+============================================================
+
+Attack Complexity Levels:
+
+============================================================
+USER INTERACTION DISTRIBUTION
+============================================================
+
+User Interaction Levels:
+
+============================================================
+SUMMARY STATISTICS
+============================================================
+
+CVSS Metrics Coverage: 62.7% (559/892 files)
+CVSS v2.0 Usage: 3.0% (17/559 files)
+CVSS v3.x Usage: 94.5% (528/559 files)
+
+
+
+
+
+
+
+
+
+### Overall
+Processing Summary:
+Total JSON files found: 242904
+Files successfully processed: 242904
+Files containing CVSS metrics: 147556
+Files with CVSS v2.0 metrics: 10565
+Files with CVSS v3.x metrics: 140660
+
+============================================================
+ALL METRICS DISTRIBUTION WITH PERCENTAGES
+============================================================
+
+Confidentiality:
+----------------------------------------
+  H: 59541 (39.4%)
+  L: 49097 (32.5%)
+  N: 34724 (23.0%)
+  P: 6783 (4.5%)
+  C: 1080 (0.7%)
+  Total entries: 151225
+
+Integrity:
+----------------------------------------
+  L: 54353 (35.9%)
+  H: 49947 (33.0%)
+  N: 37429 (24.8%)
+  P: 8421 (5.6%)
+  C: 1075 (0.7%)
+  Total entries: 151225
+
+Availability:
+----------------------------------------
+  N: 56058 (37.1%)
+  H: 55294 (36.6%)
+  L: 32105 (21.2%)
+  P: 6590 (4.4%)
+  C: 1178 (0.8%)
+  Total entries: 151225
+
+Attack Vector:
+----------------------------------------
+  N: 114568 (75.8%)
+  L: 29088 (19.2%)
+  A: 6198 (4.1%)
+  P: 1371 (0.9%)
+  Total entries: 151225
+
+Attack Complexity:
+----------------------------------------
+  L: 135180 (89.4%)
+  H: 16002 (10.6%)
+  M: 43 (0.0%)
+  Total entries: 151225
+
+Privileges Required:
+----------------------------------------
+  N: 69297 (49.3%)
+  L: 54542 (38.8%)
+  H: 16821 (12.0%)
+  Total entries: 140660
+
+User Interaction:
+----------------------------------------
+  N: 95429 (67.8%)
+  R: 45231 (32.2%)
+  Total entries: 140660
+
+Scope:
+----------------------------------------
+  U: 108126 (76.9%)
+  C: 32534 (23.1%)
+  Total entries: 140660
+
+baseSeverity:
+----------------------------------------
+  N/A: 151225 (100.0%)
+  Total entries: 151225
+
+SeverityLevel:
+----------------------------------------
+  Medium: 74397 (49.2%)
+  High: 54277 (35.9%)
+  Critical: 12354 (8.2%)
+  Low: 10177 (6.7%)
+  Total entries: 151205
+
+Authentication:
+----------------------------------------
+  S: 6212 (58.8%)
+  N: 3390 (32.1%)
+  M: 963 (9.1%)
+  Total entries: 10565
+
+============================================================
+CIA TRIAD IMPACT LEVELS (Confidentiality, Integrity, Availability)
+============================================================
+
+Confidentiality:
+
+Integrity:
+
+Availability:
+
+============================================================
+ATTACK VECTOR DISTRIBUTION
+============================================================
+
+Attack Vector Breakdown:
+  NETWORK: 114568 (75.8%)
+  ADJACENT_NETWORK: 6198 (4.1%)
+  LOCAL: 29088 (19.2%)
+  PHYSICAL: 1371 (0.9%)
+
+============================================================
+SEVERITY LEVEL DISTRIBUTION (Critical/High/Medium/Low)
+============================================================
+
+Severity Levels:
+  Critical: 12354 (8.2%)
+  High: 54277 (35.9%)
+  Medium: 74397 (49.2%)
+  Low: 10177 (6.7%)
+
+============================================================
+BASE SEVERITY DISTRIBUTION (from CVSS baseSeverity field)
+============================================================
+
+Base Severity Levels:
+  N/A: 151225 (100.0%)
+
+============================================================
+ATTACK COMPLEXITY DISTRIBUTION
+============================================================
+
+Attack Complexity Levels:
+
+============================================================
+USER INTERACTION DISTRIBUTION
+============================================================
+
+User Interaction Levels:
+
+============================================================
+SUMMARY STATISTICS
+============================================================
+
+CVSS Metrics Coverage: 60.7% (147556/242904 files)
+CVSS v2.0 Usage: 7.2% (10565/147556 files)
+CVSS v3.x Usage: 95.3% (140660/147556 files)

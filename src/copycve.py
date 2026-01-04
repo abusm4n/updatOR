@@ -2,9 +2,9 @@ import shutil
 from pathlib import Path
 
 # Paths
-names_dir = Path("./data/dataset_sw")
+names_dir = Path("./data/datafw")
 cvelist_dir = Path("~/UpdatOR/cvelistV5").expanduser()
-dest_dir = Path("./data/sw")
+dest_dir = Path("./data/fw")
 
 # Create destination directory
 dest_dir.mkdir(parents=True, exist_ok=True)

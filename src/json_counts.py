@@ -56,8 +56,8 @@ def main():
     #directory = "/home/ab/UpdatOR/cvelistV5/cves/2021"
     #directory = "/home/ab/UpdatOR/cvelistV5/cves/2022"
     #directory = "/home/ab/UpdatOR/cvelistV5/cves/2023"
-    directory = "/home/ab/UpdatOR/cvelistV5/cves/2024"
-    #directory = "/home/ab/UpdatOR/cvelistV5/cves/2025"
+    #directory = "/home/ab/UpdatOR/cvelistV5/cves/2024"
+    directory = "/home/ab/UpdatOR/cvelistV5/cves/2025"
 
 
     # Check if directory exists

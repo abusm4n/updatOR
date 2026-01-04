@@ -411,7 +411,7 @@ def print_frequencies_with_percentages(frequency_counter, metric_type="All Metri
         print(f"  Total entries: {total_count}")
 
 # Folder containing the dataset
-dataset_folder = './data/both'
+dataset_folder = './data/sw'
 
 # Process the JSON files and get the frequency counts
 print("="*60)
