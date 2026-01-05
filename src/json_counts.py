@@ -48,7 +48,7 @@ def print_summary_by_folder(file_list):
 
 def main():
     # Use a predefined directory path
-    #directory = "/home/ab/UpdatOR/cvelistV5/cves/2016"
+    directory = "/home/ab/UpdatOR/cvelistV5/cves/2016"
     #directory = "/home/ab/UpdatOR/cvelistV5/cves/2017"
     #directory = "/home/ab/UpdatOR/cvelistV5/cves/2018"
     #directory = "/home/ab/UpdatOR/cvelistV5/cves/2019"
@@ -57,7 +57,7 @@ def main():
     #directory = "/home/ab/UpdatOR/cvelistV5/cves/2022"
     #directory = "/home/ab/UpdatOR/cvelistV5/cves/2023"
     #directory = "/home/ab/UpdatOR/cvelistV5/cves/2024"
-    directory = "/home/ab/UpdatOR/cvelistV5/cves/2025"
+    #directory = "/home/ab/UpdatOR/cvelistV5/cves/2025"
 
 
     # Check if directory exists

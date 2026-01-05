@@ -37,7 +37,7 @@ def has_multiple_cwe(cwes):
 
 # Path to dataset folder
 # dataset_folder = './data/dataset_fw'
-dataset_folder = './data/fw'
+dataset_folder = './data/both'
 
 
 # Get list of JSON files in the dataset folder

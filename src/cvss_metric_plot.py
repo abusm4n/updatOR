@@ -1062,9 +1062,9 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
 # Main execution
 if __name__ == "__main__":
     # Folder containing the dataset
-    dataset_folder = './data/sw'
-    #dataset_folder = './data/fw'
-    #dataset_folder = './data/both'
+    #dataset_folder = './data/data_sw'
+    #dataset_folder = './data/data_fw'
+    dataset_folder = './data/both'
     #dataset_folder = './data/overall'
 
 
