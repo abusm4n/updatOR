@@ -193,17 +193,23 @@ def create_cwe_visualizations(cwe_counter, location_counter, total_files, files_
         
         # Add CWE IDs as labels
         ax.set_yticks(range(len(top_cwe_ids)))
-        ax.set_yticklabels(top_cwe_ids, fontsize=9)
+        ax.set_yticklabels(top_cwe_ids, fontsize=20)
+        ax.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+
         
-        ax.set_xlabel('Number of Occurrences', fontsize=12)
-        ax.set_title(f'Top {top_n} Most Common CWE IDs', fontsize=14, fontweight='bold')
-        ax.grid(True, alpha=0.3, axis='x')
+        #ax.set_xlabel('Number of Occurrences', fontsize=20)
+        #ax.set_title(f'Top {top_n} Most Common CWE IDs', fontsize=14, fontweight='bold')
+        #ax.grid(True, alpha=0.6, axis='x')
+
+
+        # 🔑 Make highest count appear at the top
+        ax.invert_yaxis()
         
         # Add count labels on bars
         for i, (bar, count) in enumerate(zip(bars, top_cwe_counts)):
             width = bar.get_width()
             ax.text(width + 0.5, bar.get_y() + bar.get_height()/2, 
-                   f'{count}', ha='left', va='center', fontsize=9)
+                   f'{count}', ha='left', va='center', fontsize=20)
         
         plt.tight_layout()
         plt.savefig(os.path.join(output_dir, '01_top_cwe_ids.pdf'), dpi=300, bbox_inches='tight')
@@ -394,8 +400,8 @@ if __name__ == "__main__":
     # Choose one of these paths based on your data location
     # dataset_folder = './data/data_sw'
     # dataset_folder = './data/data_fw'
-    dataset_folder = './data/both'
-    #dataset_folder = './data/overall'  # Adjust this path as needed
+    #dataset_folder = './data/both'
+    dataset_folder = './data/overall'  # Adjust this path as needed
     
     print("="*60)
     print("CWE (Common Weakness Enumeration) ANALYSIS")
