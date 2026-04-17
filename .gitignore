@@ -35,6 +35,8 @@ src/securebert-iot/
 
 
 ## other folders to ignore
+docs/
+Latex_Paper/
 src/cve_classifier_results/
 src/cve_classifier_model/
 src/models
