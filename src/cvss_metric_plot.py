@@ -13,6 +13,17 @@ warnings.filterwarnings('ignore')
 plt.style.use('seaborn-v0_8-darkgrid')
 sns.set_palette("husl")
 
+# Unified color palette across all figures
+COLOR_RED = '#E74C3C'
+COLOR_ORANGE = '#E67E22'
+COLOR_YELLOW = '#F1C40F'
+COLOR_GREEN = '#2ECC71'
+COLOR_BLUE = '#3498DB'
+COLOR_GRAY = '#95A5A6'
+COLOR_DARK = '#1f1f1f'
+COLOR_LIGHT_ROW = '#f2f2f2'
+COLOR_NOTE_BG = '#F5E6C8'
+
 def extract_metrics(cvss_data):
     """Extract CVSS metrics from CVSS data object"""
     metrics = {}
@@ -443,11 +454,28 @@ def print_frequencies_with_percentages(frequency_counter, metric_type="All Metri
         
         print(f"  Total entries: {total_count}")
 
-def create_visualizations(frequency_counts, total_files, files_with_metrics, cvss_v2_files, cvss_v3_files):
+
+def resolve_output_dir(dataset_folder):
+    """Resolve output plot directory based on selected dataset folder."""
+    dataset_key = os.path.basename(os.path.normpath(dataset_folder))
+
+    explicit_map = {
+        'data_fw': 'cvss_plots_fw',
+        'data_sw': 'cvss_plots_sw',
+        'both': 'cvss_plots_both',
+        'overall': 'cvss_plots_overall'
+    }
+
+    if dataset_key in explicit_map:
+        return f"./{explicit_map[dataset_key]}"
+
+    return f"./cvss_plots_{dataset_key}"
+
+def create_visualizations(frequency_counts, total_files, files_with_metrics, cvss_v2_files, cvss_v3_files, dataset_folder):
     """Create comprehensive visualizations for CVSS metrics and save as high-quality PDFs"""
     
     # Create directory for saving plots
-    output_dir = './cvss_plots_pdf'
+    output_dir = resolve_output_dir(dataset_folder)
     os.makedirs(output_dir, exist_ok=True)
     
     # Set PDF saving parameters for highest quality
@@ -466,7 +494,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
         'font.size': 10,
         'axes.titlesize': 12,
         'axes.labelsize': 11,
-        'xtick.labelsize': 10,
+        'xtick.labelsize': 16,
         'ytick.labelsize': 10,
         'legend.fontsize': 9,
         'figure.titlesize': 14,
@@ -491,13 +519,13 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
         if sizes:  # Only create chart if we have data
             # Define color mapping for severity levels
             color_map = {
-                'Critical': '#FF6B6B',  # Red
-                'High': '#FF9B71',      # Orange-red
-                'Medium': '#FFD166',     # Yellow
-                'Low': '#06D6A0'        # Green
+                'Critical': COLOR_RED,
+                'High': COLOR_ORANGE,
+                'Medium': COLOR_YELLOW,
+                'Low': COLOR_GREEN
             }
             
-            colors = [color_map.get(label, '#118AB2') for label in labels]
+            colors = [color_map.get(label, COLOR_BLUE) for label in labels]
             
             ax1.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%',
                     startangle=90, shadow=True, explode=[0.05]*len(labels))
@@ -507,7 +535,8 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
             # Bar chart for comparison
             bars = ax2.bar(labels, sizes, color=colors, edgecolor='black', linewidth=1.5)
             ax2.set_title('CVSS Severity Counts', fontsize=14, fontweight='bold')
-            ax2.set_xlabel('Severity Level', fontsize=12)
+            ax2.set_xlabel('Severity Level', fontsize=14)
+            ax2.tick_params(axis='x', labelsize=16)
             ax2.set_ylabel('Count', fontsize=12)
             ax2.grid(True, alpha=0.3, axis='y')
             
@@ -553,12 +582,12 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
         angles += angles[:1]
         
         # Plot
-        ax.plot(angles, values, 'o-', linewidth=2, color='#4A90E2', markersize=8)
-        ax.fill(angles, values, alpha=0.25, color='#4A90E2')
+        ax.plot(angles, values, 'o-', linewidth=2, color=COLOR_BLUE, markersize=8)
+        ax.fill(angles, values, alpha=0.25, color=COLOR_BLUE)
         
         # Set labels
         ax.set_xticks(angles[:-1])
-        ax.set_xticklabels(categories, fontsize=12, fontweight='bold')
+        ax.set_xticklabels(categories, fontsize=16, fontweight='bold')
         ax.set_ylim(0, 100)
         ax.set_yticks([0, 25, 50, 75, 100])
         ax.set_yticklabels(['0%', '25%', '50%', '75%', '100%'], fontsize=10)
@@ -574,7 +603,8 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
         plt.close(fig)
     
     # 3. ATTACK VECTOR & COMPLEXITY BAR CHART - FIXED VERSION
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(16, 6.5))
+    #fig.suptitle('Attack Surface Metrics', fontsize=16, fontweight='bold', y=1.02)
     
     plot_created = False  # Track if any plot was created
     
@@ -613,22 +643,31 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
                 av_values.append(count)
         
         if av_values:  # Only plot if we have data
-            bars1 = axes[0].bar(av_labels, av_values, color=['#FF6B6B', '#FFD166', '#06D6A0', '#118AB2'][:len(av_labels)])
-            axes[0].set_title('Attack Vector Distribution', fontsize=14, fontweight='bold')
-            axes[0].set_xlabel('Attack Vector', fontsize=12)
-            axes[0].set_ylabel('#Vulnerabilities', fontsize=12)
-            axes[0].tick_params(axis='x', rotation=0)
+            bars1 = axes[0].bar(
+                av_labels,
+                av_values,
+                color=[COLOR_RED, COLOR_YELLOW, COLOR_GREEN, COLOR_BLUE][:len(av_labels)],
+                edgecolor=COLOR_DARK,
+                linewidth=1.0,
+                alpha=0.92
+            )
+            axes[0].set_title('Attack Vector', fontsize=14, fontweight='bold')
+            #axes[0].set_xlabel('Attack Vector', fontsize=14)
+            axes[0].set_ylabel('#Vulnerabilities', fontsize=14)
+            axes[0].tick_params(axis='x', rotation=0, labelsize=16)
             axes[0].grid(True, alpha=0.3, axis='y')
+            axes[0].set_ylim(0, max(av_values) * 1.15)
+            av_offset = max(av_values) * 0.015
             
             for bar in bars1:
                 height = bar.get_height()
-                axes[0].text(bar.get_x() + bar.get_width()/2., height + 0.5,
+                axes[0].text(bar.get_x() + bar.get_width()/2., height + av_offset,
                         f'{int(height)}', ha='center', va='bottom', fontweight='bold')
             plot_created = True
     else:
         axes[0].text(0.5, 0.5, 'No Attack Vector Data', 
                     ha='center', va='center', fontsize=12, fontweight='bold')
-        axes[0].set_title('Attack Vector Distribution', fontsize=14, fontweight='bold')
+        axes[0].set_title('Attack Vector', fontsize=14, fontweight='bold')
         axes[0].axis('off')
     
     # Attack Complexity - FIXED
@@ -638,6 +677,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
         # Clean and process attack complexity data
         ac_labels = []
         ac_values = []
+        excluded_medium_count = 0
         
         # Standardize labels
         standardized_counts = Counter()
@@ -647,6 +687,8 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
                 standardized_counts['LOW'] += count
             elif 'HIGH' in key_str or key_str == 'H':
                 standardized_counts['HIGH'] += count
+            elif 'MEDIUM' in key_str or key_str == 'M':
+                excluded_medium_count += count
             elif key_str != 'N/A':
                 # For any other values
                 standardized_counts[key_str] += count
@@ -666,28 +708,42 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
         
         if ac_values:  # Only plot if we have data
             # Use appropriate colors
-            color_map = {'LOW': '#06D6A0', 'HIGH': '#FF6B6B'}  # Green for LOW, Red for HIGH
-            colors = [color_map.get(label.upper(), '#118AB2') for label in ac_labels]
+            color_map = {'LOW': COLOR_GREEN, 'HIGH': COLOR_RED}
+            colors = [color_map.get(label.upper(), COLOR_BLUE) for label in ac_labels]
             
-            bars2 = axes[1].bar(ac_labels, ac_values, color=colors)
-            axes[1].set_title('Attack Complexity Distribution', fontsize=14, fontweight='bold')
-            axes[1].set_xlabel('Attack Complexity', fontsize=12)
-            axes[1].set_ylabel('#Vulnerabilities', fontsize=12)
+            bars2 = axes[1].bar(
+                ac_labels,
+                ac_values,
+                color=colors,
+                edgecolor=COLOR_DARK,
+                linewidth=1.0,
+                alpha=0.92
+            )
+            ac_title = 'Attack Complexity'
+            if excluded_medium_count > 0:
+                ac_title += f" (CVSSv2 MEDIUM ={excluded_medium_count})"
+            axes[1].set_title(ac_title, fontsize=14, fontweight='bold', pad=12)
+            #axes[1].set_xlabel('Attack Complexity', fontsize=14)
+            axes[1].set_ylabel('#Vulnerabilities', fontsize=14)
+            axes[1].tick_params(axis='x', labelsize=16)
             axes[1].grid(True, alpha=0.3, axis='y')
+            axes[1].set_ylim(0, max(ac_values) * 1.15)
+            ac_offset = max(ac_values) * 0.015
             
             for bar in bars2:
                 height = bar.get_height()
-                axes[1].text(bar.get_x() + bar.get_width()/2., height + 0.5,
+                axes[1].text(bar.get_x() + bar.get_width()/2., height + ac_offset,
                         f'{int(height)}', ha='center', va='bottom', fontweight='bold')
             plot_created = True
     else:
         axes[1].text(0.5, 0.5, 'No Attack Complexity Data', 
                     ha='center', va='center', fontsize=12, fontweight='bold')
-        axes[1].set_title('Attack Complexity Distribution', fontsize=14, fontweight='bold')
+        axes[1].set_title('Attack Complexity', fontsize=14, fontweight='bold')
         axes[1].axis('off')
     
     if plot_created:
-        plt.tight_layout()
+        sns.despine(fig=fig, top=True, right=True)
+        plt.tight_layout(rect=[0, 0, 1, 0.96])
         # Save as PDF
         pdf_path = os.path.join(output_dir, '03_attack_metrics.pdf')
         plt.savefig(pdf_path, **pdf_kwargs)
@@ -711,7 +767,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
             versions.append('CVSS v3.x')
             version_counts.append(cvss_v3_files)
         
-        version_colors = ['#FFD166', '#118AB2'][:len(versions)]
+        version_colors = [COLOR_YELLOW, COLOR_BLUE][:len(versions)]
         
         wedges, texts, autotexts = ax1.pie(version_counts, labels=versions, colors=version_colors,
                                            autopct='%1.1f%%', startangle=90, explode=[0.05]*len(versions))
@@ -735,7 +791,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
             'Without CVSS Metrics': total_files - files_with_metrics
         }
         
-        colors = ['#06D6A0', '#EF476F']
+        colors = [COLOR_GREEN, COLOR_RED]
         bars = ax2.bar(list(coverage_data.keys()), list(coverage_data.values()), 
                       color=colors, edgecolor='black', linewidth=1.5)
         ax2.set_title('CVSS Metrics Coverage', fontsize=14, fontweight='bold')
@@ -792,18 +848,19 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
                     
                     if level_counts:
                         colors_map = {
-                            'HIGH': '#E74C3C',
-                            'MEDIUM': '#F1C40F',
-                            'LOW': '#3498DB',
-                            'NONE': '#95A5A6'
+                            'HIGH': COLOR_RED,
+                            'MEDIUM': COLOR_YELLOW,
+                            'LOW': COLOR_BLUE,
+                            'NONE': COLOR_GRAY
                         }
                         
-                        colors = [colors_map.get(label, '#95A5A6') for label in level_labels]
+                        colors = [colors_map.get(label, COLOR_GRAY) for label in level_labels]
                         
                         bars = axes[idx].bar(level_labels, level_counts, color=colors, edgecolor='black')
                         axes[idx].set_title(f'{metric} Impact', fontsize=12, fontweight='bold')
-                        axes[idx].set_xlabel('Impact Level', fontsize=10)
-                        axes[idx].set_ylabel('#Vulnerabilities', fontsize=10)
+                        #axes[idx].set_xlabel('Impact Level', fontsize=14)
+                        axes[idx].tick_params(axis='x', labelsize=16)
+                        axes[idx].set_ylabel('#Vulnerabilities', fontsize=14)
                         axes[idx].grid(True, alpha=0.3, axis='y')
                         
                         for bar in bars:
@@ -826,7 +883,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
                 axes[idx].set_title(f'{metric} Impact', fontsize=12, fontweight='bold')
                 axes[idx].axis('off')
         
-        plt.suptitle('CIA Impact Levels Detailed Breakdown', fontsize=14, fontweight='bold', y=1.05)
+        #plt.suptitle('CIA Impact Levels Detailed Breakdown', fontsize=14, fontweight='bold', y=1.05)
         plt.tight_layout()
         # Save as PDF
         pdf_path = os.path.join(output_dir, '05_cia_detailed.pdf')
@@ -879,7 +936,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
         
         if cia_high_counts:
             bars = ax2.bar(valid_metrics, cia_high_counts,
-                          color=['#E74C3C', '#3498DB', '#2ECC71'][:len(valid_metrics)])
+                          color=[COLOR_RED, COLOR_BLUE, COLOR_GREEN][:len(valid_metrics)])
             ax2.set_title('CIA - % High Impact', fontweight='bold', fontsize=11)
             ax2.set_ylabel('Percentage (%)', fontsize=9)
             ax2.set_ylim(0, 100)
@@ -925,7 +982,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
             bars = ax3.bar(list(av_filtered.keys()), list(av_filtered.values()))
             ax3.set_title('Attack Vector', fontweight='bold', fontsize=11)
             ax3.set_ylabel('Count', fontsize=9)
-            ax3.tick_params(axis='x', rotation=0)
+            ax3.tick_params(axis='x', rotation=0, labelsize=16)
             ax3.grid(True, alpha=0.3, axis='y')
         else:
             ax3.text(0.5, 0.5, 'No Attack Vector Data', 
@@ -953,10 +1010,10 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
                 metric_names.append(metric)
     
     if metrics_stats:
-        bars = ax4.bar(metric_names, metrics_stats, color='steelblue')
+        bars = ax4.bar(metric_names, metrics_stats, color=COLOR_BLUE)
         ax4.set_title('Metrics Coverage (Total Entries)', fontweight='bold', fontsize=11)
         ax4.set_ylabel('Count', fontsize=9)
-        ax4.tick_params(axis='x', rotation=0)
+        ax4.tick_params(axis='x', rotation=0, labelsize=16)
         ax4.grid(True, alpha=0.3, axis='y')
         
         for bar in bars:
@@ -989,7 +1046,7 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
     
     ax5.text(0.1, 0.5, summary_text, fontfamily='monospace', fontsize=9,
             verticalalignment='center', transform=ax5.transAxes,
-            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+            bbox=dict(boxstyle='round', facecolor=COLOR_NOTE_BG, alpha=0.5))
     
     plt.suptitle('CVSS Metrics Dashboard', fontsize=16, fontweight='bold', y=0.98)
     plt.tight_layout()
@@ -1036,14 +1093,14 @@ def create_visualizations(frequency_counts, total_files, files_with_metrics, cvs
             
             # Color header
             for i in range(3):
-                table[(0, i)].set_facecolor('#4A90E2')
+                table[(0, i)].set_facecolor(COLOR_BLUE)
                 table[(0, i)].set_text_props(weight='bold', color='white')
             
             # Alternate row colors
             for i in range(1, len(table_data) + 1):
                 if i % 2 == 0:
                     for j in range(3):
-                        table[(i, j)].set_facecolor('#f2f2f2')
+                        table[(i, j)].set_facecolor(COLOR_LIGHT_ROW)
             
             ax.set_title('CVSS Metrics Summary Table', fontsize=14, fontweight='bold', pad=20)
             
@@ -1064,8 +1121,8 @@ if __name__ == "__main__":
     # Folder containing the dataset
     #dataset_folder = './data/data_sw'
     #dataset_folder = './data/data_fw'
-    dataset_folder = './data/both'
-    #dataset_folder = './data/overall'
+    #dataset_folder = './data/both'
+    dataset_folder = './data/overall'
 
 
     
@@ -1144,6 +1201,7 @@ if __name__ == "__main__":
     if 'Attack Complexity' in frequency_counts and frequency_counts['Attack Complexity']:
         ac_counts = frequency_counts['Attack Complexity']
         total_ac = sum(ac_counts.values())
+        excluded_medium_count = 0
         
         print("\nAttack Complexity Breakdown:")
         # Standardize labels for printing
@@ -1154,6 +1212,8 @@ if __name__ == "__main__":
                 standardized_counts['LOW'] += count
             elif 'HIGH' in key_str or key_str == 'H':
                 standardized_counts['HIGH'] += count
+            elif 'MEDIUM' in key_str or key_str == 'M':
+                excluded_medium_count += count
             elif key_str != 'N/A':
                 standardized_counts[key_str] += count
         
@@ -1161,6 +1221,10 @@ if __name__ == "__main__":
             if count > 0:
                 percentage = (count / total_ac) * 100
                 print(f"  {label}: {count} ({percentage:.1f}%)")
+
+        if excluded_medium_count > 0:
+            excluded_pct = (excluded_medium_count / total_ac) * 100
+            print(f"  [Excluded for comparability] MEDIUM (M): {excluded_medium_count} ({excluded_pct:.1f}%)")
 
     # Severity Level breakdown
     print("\n" + "="*60)
@@ -1201,4 +1265,4 @@ if __name__ == "__main__":
     print("GENERATING VISUALIZATIONS")
     print("="*60)
     
-    create_visualizations(frequency_counts, total_files, files_with_metrics, cvss_v2_files, cvss_v3_files)
+    create_visualizations(frequency_counts, total_files, files_with_metrics, cvss_v2_files, cvss_v3_files, dataset_folder)

@@ -1,0 +1,51 @@
+class,rank,cwe_id,cwe_name,count
+Home,1,CWE-121,CWE-121: Stack-based Buffer Overflow,6
+Home,2,CWE-494,CWE-494 Insufficient checks on origin,6
+Home,3,CWE-77,CWE-77 Improper Neutralization of Special Elements used in a Command ('Command Injection'),6
+Home,4,CWE-22,CWE-22 Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal'),5
+Home,5,CWE-345,CWE-345 Insufficient Verification of Data Authenticity,5
+Home,6,CWE-295,CWE-295,4
+Home,7,CWE-347,CWE-347: Improper Verification of Cryptographic Signature,4
+Home,8,CWE-306,CWE-306 Missing Authentication for Critical Function,3
+Home,9,CWE-284,CWE-284 Improper Access Control,3
+Home,10,CWE-354,CWE-354: Improper Validation of Integrity Check Value,3
+SCADA,1,CWE-823,CWE - CWE-823: Use of Out-of-range Pointer Offset (4.16),10
+SCADA,2,CWE-306,CWE-306:  Missing Authentication for Critical Function,6
+SCADA,3,CWE-755,CWE-755: Improper Handling of Exceptional Conditions,4
+SCADA,4,CWE-321,CWE-321: Use of Hard-coded Cryptographic Key,4
+SCADA,5,CWE-494,CWE-494,3
+SCADA,6,CWE-347,CWE-347: Improper Verification of Cryptographic Signature,3
+SCADA,7,CWE-434,UNRESTRICTED UPLOAD OF FILE WITH DANGEROUS TYPE CWE-434,3
+SCADA,8,CWE-798,CWE-798 Use of Hard-coded Credentials,2
+SCADA,9,CWE-345,CWE-345: Insufficient Verification of Data Authenticity,2
+SCADA,10,CWE-319,CWE-319 Cleartext Transmission of Sensitive Information,2
+Enterprise,1,CWE-347,CWE-347,7
+Enterprise,2,CWE-20,CWE-20,6
+Enterprise,3,CWE-378,CWE-378,6
+Enterprise,4,CWE-78,CWE-78,5
+Enterprise,5,CWE-284,CWE-284,4
+Enterprise,6,CWE-287,CWE-287,3
+Enterprise,7,CWE-345,CWE-345,3
+Enterprise,8,CWE-295,CWE-295,3
+Enterprise,9,CWE-22,Path Traversal (CWE-22),3
+Enterprise,10,CWE-434,CWE-434 Unrestricted Upload of File with Dangerous Type,3
+Mobile,1,CWE-20,CWE-20: Improper Input Validation,2
+Mobile,2,CWE-434,UNRESTRICTED UPLOAD OF FILE WITH DANGEROUS TYPE CWE-434,1
+Mobile,3,CWE-502,CWE-502 Deserialization of Untrusted Data,1
+Mobile,4,CWE-367,CWE-367 Time-of-check Time-of-use (TOCTOU) Race Condition,1
+Mobile,5,CWE-862,CWE-862 Missing Authorization,1
+Mobile,6,CWE-276,CWE-276 Incorrect Default Permissions,1
+Mobile,7,CWE-703,CWE-703 Improper Check or Handling of Exceptional Conditions,1
+Mobile,8,CWE-427,CWE-427 Uncontrolled Search Path Element,1
+Mobile,9,CWE-345,CWE-345: Insufficient Verification of Data Authenticity,1
+Mobile,10,CWE-306,Missing authentication for critical function,1
+PC,1,CWE-347,CWE-347 Improper Verification of Cryptographic Signature,13
+PC,2,CWE-427,CWE-427: Uncontrolled Search Path Element,7
+PC,3,CWE-345,CWE-345: Insufficient Verification of Data Authenticity,5
+PC,4,CWE-20,CWE-20 Improper Input Validation,5
+PC,5,CWE-367,CWE-367 Time-of-check Time-of-use (TOCTOU) Race Condition,4
+PC,6,CWE-200,CWE-200 Exposure of Sensitive Information to an Unauthorized Actor,4
+PC,7,CWE-295,CWE-295 Improper Certificate Validation,3
+PC,8,CWE-494,CWE-494 Download of Code Without Integrity Check,3
+PC,9,CWE-1386,CWE-1386: Insecure Operation on Windows Junction / Mount Point,3
+PC,10,CWE-306,CWE-306 Missing Authentication for Critical Function,3
