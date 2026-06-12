@@ -1,0 +1,51 @@
+class,rank,cwe_id,cwe_name,count
+Home,1,CWE-79,CWE-79 Cross-site Scripting (XSS),1518
+Home,2,CWE-121,CWE-121: Stack-based Buffer Overflow,605
+Home,3,CWE-862,CWE-862 Missing Authorization,488
+Home,4,CWE-352,CWE-352 Cross-Site Request Forgery (CSRF),482
+Home,5,CWE-78,CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection'),395
+Home,6,CWE-120,CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow'),375
+Home,7,CWE-787,CWE-787 Out-of-bounds Write,375
+Home,8,CWE-89,CWE-89 SQL Injection,375
+Home,9,CWE-416,Use After Free (CWE-416),322
+Home,10,CWE-20,CWE-20: Improper Input Validation,314
+SCADA,1,CWE-79,CWE-79 Cross-site Scripting (XSS),786
+SCADA,2,CWE-89,CWE-89 SQL Injection,495
+SCADA,3,CWE-125,CWE-125: Out-of-bounds Read,454
+SCADA,4,CWE-787,CWE-787 Out-of-bounds Write,367
+SCADA,5,CWE-20,CWE-20 Improper Input Validation,235
+SCADA,6,CWE-862,CWE-862: Missing Authorization,204
+SCADA,7,CWE-352,CWE-352 Cross-Site Request Forgery (CSRF),203
+SCADA,8,CWE-22,CWE-22 Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal'),200
+SCADA,9,CWE-121,CWE-121 Stack-Based Buffer Overflow,194
+SCADA,10,CWE-284,CWE-284 Improper Access Control,183
+Enterprise,1,CWE-89,CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection'),2428
+Enterprise,2,CWE-79,CWE-79,2328
+Enterprise,3,CWE-74,CWE-74,1425
+Enterprise,4,CWE-20,CWE-20,1156
+Enterprise,5,CWE-22,CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal'),901
+Enterprise,6,CWE-284,CWE-284 Improper Access Control,804
+Enterprise,7,CWE-78,Improper access control,687
+Enterprise,8,CWE-200,Information disclosure,678
+Enterprise,9,CWE-400,CWE-400,504
+Enterprise,10,CWE-94,CWE-94 Improper Control of Generation of Code ('Code Injection'),470
+Mobile,1,CWE-79,CWE-79 Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting'),232
+Mobile,2,CWE-787,CWE-787 Out-of-bounds Write,231
+Mobile,3,CWE-89,CWE-89 Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection'),190
+Mobile,4,CWE-125,CWE-125 Out-of-bounds Read,169
+Mobile,5,CWE-200,CWE-200: Exposure of Sensitive Information to an Unauthorized Actor,146
+Mobile,6,CWE-20,CWE-20 Improper Input Validation,122
+Mobile,7,CWE-284,CWE-284 Improper Access Control,120
+Mobile,8,CWE-416,CWE-416 Use After Free,92
+Mobile,9,CWE-74,CWE-74 Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection'),90
+Mobile,10,CWE-862,CWE-862 Missing Authorization,83
+PC,1,CWE-79,CWE-79 Cross-site Scripting (XSS),2916
+PC,2,CWE-416,CWE-416: Use After Free,1065
+PC,3,CWE-125,CWE-125: Out of bound read,915
+PC,4,CWE-20,CWE-20: Improper Input Validation,793
+PC,5,CWE-476,CWE-476: NULL Pointer Dereference,692
+PC,6,CWE-787,CWE-787 Out-of-bounds Write,605
+PC,7,CWE-122,CWE-122 Heap-based Buffer Overflow,496
+PC,8,CWE-200,CWE-200 Exposure of Sensitive Information to an Unauthorized Actor,480
+PC,9,CWE-284,CWE-284: Improper Access Control,470
+PC,10,CWE-89,CWE-89 SQL Injection,468

@@ -34,13 +34,20 @@ Thumbs.db
 src/securebert-iot/
 
 
-## other folders to ignore
-docs/
-Latex_Paper/
-src/cve_classifier_results/
-src/cve_classifier_model/
-src/models
-cvelistV5/
+
+
 
 # Ignore .csv files with potentially sensitive data
 # *.csv
+
+
+## other folders to ignore
+docs/
+latex_paper/
+src/cve_classifier_results/
+src/cve_classifier_model/
+src/models
+cvelistV5/l
+latex/
+
+

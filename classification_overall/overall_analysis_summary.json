@@ -1,0 +1,282 @@
+{
+  "total_enhanced": 230277,
+  "total_desc_only": 242904,
+  "enhanced_counts": {
+    "Home": 18004,
+    "SCADA": 8867,
+    "Enterprise": 41742,
+    "Mobile": 10462,
+    "PC": 42818,
+    "Other": 108384
+  },
+  "desc_only_counts": {
+    "Home": 8013,
+    "SCADA": 1437,
+    "Enterprise": 15446,
+    "Mobile": 8161,
+    "PC": 40393,
+    "Other": 169454
+  },
+  "top_weaknesses": {
+    "Home": [
+      {
+        "cwe_id": "CWE-79",
+        "count": 1518,
+        "cwe_name": "CWE-79 Cross-site Scripting (XSS)"
+      },
+      {
+        "cwe_id": "CWE-121",
+        "count": 605,
+        "cwe_name": "CWE-121: Stack-based Buffer Overflow"
+      },
+      {
+        "cwe_id": "CWE-862",
+        "count": 488,
+        "cwe_name": "CWE-862 Missing Authorization"
+      },
+      {
+        "cwe_id": "CWE-352",
+        "count": 482,
+        "cwe_name": "CWE-352 Cross-Site Request Forgery (CSRF)"
+      },
+      {
+        "cwe_id": "CWE-78",
+        "count": 395,
+        "cwe_name": "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+      },
+      {
+        "cwe_id": "CWE-120",
+        "count": 375,
+        "cwe_name": "CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')"
+      },
+      {
+        "cwe_id": "CWE-787",
+        "count": 375,
+        "cwe_name": "CWE-787 Out-of-bounds Write"
+      },
+      {
+        "cwe_id": "CWE-89",
+        "count": 375,
+        "cwe_name": "CWE-89 SQL Injection"
+      },
+      {
+        "cwe_id": "CWE-416",
+        "count": 322,
+        "cwe_name": "Use After Free (CWE-416)"
+      },
+      {
+        "cwe_id": "CWE-20",
+        "count": 314,
+        "cwe_name": "CWE-20: Improper Input Validation"
+      }
+    ],
+    "SCADA": [
+      {
+        "cwe_id": "CWE-79",
+        "count": 786,
+        "cwe_name": "CWE-79 Cross-site Scripting (XSS)"
+      },
+      {
+        "cwe_id": "CWE-89",
+        "count": 495,
+        "cwe_name": "CWE-89 SQL Injection"
+      },
+      {
+        "cwe_id": "CWE-125",
+        "count": 454,
+        "cwe_name": "CWE-125: Out-of-bounds Read"
+      },
+      {
+        "cwe_id": "CWE-787",
+        "count": 367,
+        "cwe_name": "CWE-787 Out-of-bounds Write"
+      },
+      {
+        "cwe_id": "CWE-20",
+        "count": 235,
+        "cwe_name": "CWE-20 Improper Input Validation"
+      },
+      {
+        "cwe_id": "CWE-862",
+        "count": 204,
+        "cwe_name": "CWE-862: Missing Authorization"
+      },
+      {
+        "cwe_id": "CWE-352",
+        "count": 203,
+        "cwe_name": "CWE-352 Cross-Site Request Forgery (CSRF)"
+      },
+      {
+        "cwe_id": "CWE-22",
+        "count": 200,
+        "cwe_name": "CWE-22 Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+      },
+      {
+        "cwe_id": "CWE-121",
+        "count": 194,
+        "cwe_name": "CWE-121 Stack-Based Buffer Overflow"
+      },
+      {
+        "cwe_id": "CWE-284",
+        "count": 183,
+        "cwe_name": "CWE-284 Improper Access Control"
+      }
+    ],
+    "Enterprise": [
+      {
+        "cwe_id": "CWE-89",
+        "count": 2428,
+        "cwe_name": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      },
+      {
+        "cwe_id": "CWE-79",
+        "count": 2328,
+        "cwe_name": "CWE-79"
+      },
+      {
+        "cwe_id": "CWE-74",
+        "count": 1425,
+        "cwe_name": "CWE-74"
+      },
+      {
+        "cwe_id": "CWE-20",
+        "count": 1156,
+        "cwe_name": "CWE-20"
+      },
+      {
+        "cwe_id": "CWE-22",
+        "count": 901,
+        "cwe_name": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+      },
+      {
+        "cwe_id": "CWE-284",
+        "count": 804,
+        "cwe_name": "CWE-284 Improper Access Control"
+      },
+      {
+        "cwe_id": "CWE-78",
+        "count": 687,
+        "cwe_name": "Improper access control"
+      },
+      {
+        "cwe_id": "CWE-200",
+        "count": 678,
+        "cwe_name": "Information disclosure"
+      },
+      {
+        "cwe_id": "CWE-400",
+        "count": 504,
+        "cwe_name": "CWE-400"
+      },
+      {
+        "cwe_id": "CWE-94",
+        "count": 470,
+        "cwe_name": "CWE-94 Improper Control of Generation of Code ('Code Injection')"
+      }
+    ],
+    "Mobile": [
+      {
+        "cwe_id": "CWE-79",
+        "count": 232,
+        "cwe_name": "CWE-79 Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      },
+      {
+        "cwe_id": "CWE-787",
+        "count": 231,
+        "cwe_name": "CWE-787 Out-of-bounds Write"
+      },
+      {
+        "cwe_id": "CWE-89",
+        "count": 190,
+        "cwe_name": "CWE-89 Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      },
+      {
+        "cwe_id": "CWE-125",
+        "count": 169,
+        "cwe_name": "CWE-125 Out-of-bounds Read"
+      },
+      {
+        "cwe_id": "CWE-200",
+        "count": 146,
+        "cwe_name": "CWE-200: Exposure of Sensitive Information to an Unauthorized Actor"
+      },
+      {
+        "cwe_id": "CWE-20",
+        "count": 122,
+        "cwe_name": "CWE-20 Improper Input Validation"
+      },
+      {
+        "cwe_id": "CWE-284",
+        "count": 120,
+        "cwe_name": "CWE-284 Improper Access Control"
+      },
+      {
+        "cwe_id": "CWE-416",
+        "count": 92,
+        "cwe_name": "CWE-416 Use After Free"
+      },
+      {
+        "cwe_id": "CWE-74",
+        "count": 90,
+        "cwe_name": "CWE-74 Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')"
+      },
+      {
+        "cwe_id": "CWE-862",
+        "count": 83,
+        "cwe_name": "CWE-862 Missing Authorization"
+      }
+    ],
+    "PC": [
+      {
+        "cwe_id": "CWE-79",
+        "count": 2916,
+        "cwe_name": "CWE-79 Cross-site Scripting (XSS)"
+      },
+      {
+        "cwe_id": "CWE-416",
+        "count": 1065,
+        "cwe_name": "CWE-416: Use After Free"
+      },
+      {
+        "cwe_id": "CWE-125",
+        "count": 915,
+        "cwe_name": "CWE-125: Out of bound read"
+      },
+      {
+        "cwe_id": "CWE-20",
+        "count": 793,
+        "cwe_name": "CWE-20: Improper Input Validation"
+      },
+      {
+        "cwe_id": "CWE-476",
+        "count": 692,
+        "cwe_name": "CWE-476: NULL Pointer Dereference"
+      },
+      {
+        "cwe_id": "CWE-787",
+        "count": 605,
+        "cwe_name": "CWE-787 Out-of-bounds Write"
+      },
+      {
+        "cwe_id": "CWE-122",
+        "count": 496,
+        "cwe_name": "CWE-122 Heap-based Buffer Overflow"
+      },
+      {
+        "cwe_id": "CWE-200",
+        "count": 480,
+        "cwe_name": "CWE-200 Exposure of Sensitive Information to an Unauthorized Actor"
+      },
+      {
+        "cwe_id": "CWE-284",
+        "count": 470,
+        "cwe_name": "CWE-284: Improper Access Control"
+      },
+      {
+        "cwe_id": "CWE-89",
+        "count": 468,
+        "cwe_name": "CWE-89 SQL Injection"
+      }
+    ]
+  }
+}

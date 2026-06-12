@@ -731,7 +731,7 @@ def plot_cwe_heatmap(
     heatmap_df = pd.DataFrame(data).sort_values("_total", ascending=False).head(top_n).drop(columns=["_total"])
     heatmap_df = heatmap_df.set_index("cwe")
 
-    sns.set_theme(style="white", context="paper")
+    sns.set_theme(style="white", context="paper", font_scale=2.0)
     fig_height = max(6, 0.35 * len(heatmap_df) + 2)
     fig, ax = plt.subplots(figsize=(9, fig_height), dpi=180)
     sns.heatmap(
@@ -741,12 +741,16 @@ def plot_cwe_heatmap(
         cmap="YlGnBu",
         linewidths=0.5,
         cbar_kws={"label": "CWE count"},
+        annot_kws={"size": 14},
         ax=ax,
     )
 
     #.ax.set_title(f"Top {top_n} CWE Overlap Across Target-System Classes", fontsize=16, weight="bold", pad=14)
     ax.set_xlabel("")
-    ax.set_ylabel("CWE")
+    ax.set_ylabel("")
+    for label in ax.get_yticklabels():
+        label.set_ha("left")
+    ax.yaxis.set_tick_params(pad=90)
     plt.tight_layout()
     plt.savefig(output_path, bbox_inches="tight")
     plt.close(fig)
