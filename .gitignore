@@ -49,5 +49,8 @@ src/cve_classifier_model/
 src/models
 cvelistV5/l
 latex/
+*.aux
+*.fdb_latexmk
+*.fls
 
 

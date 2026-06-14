@@ -1,0 +1,2507 @@
+%% EO:  \ubrk used.
+\DocumentMetadata{%
+pdfversion=1.7,%
+%pdfversion=1.3,%
+xmp=false,%
+testphase={new-or-1}}%
+
+\documentclass[fleqn,s1,names,tex]{neptune}
+
+\usepackage[5.5]{neptune-els-dtd}
+
+\bookindate{2026-06-08}
+\proofdate{2026-06-12}
+ %% for non-CAS
+ %% for CAS
+
+\usepackage[casnptn]{neptune-els} %% for CAS
+
+    
+
+\begin{pkg}
+\end{pkg}
+\begin{additionalpkgs}
+
+
+
+
+\end{additionalpkgs}
+
+
+
+
+
+\usepackage{stm-els-tagpdf}
+%\tagpdfsetup{paratagging-show=true}
+
+\begin{document}
+\newproof{proof}{Proof}
+
+\long\def\stmdocshl#1{#1}
+\long\def\stmdocstextcolor#1#2{#2}
+\long\def\stmdocscolor#1{}
+
+
+\begin{macros}
+
+
+\end{macros}
+\begin{additionalmacros}
+
+\jshort
+\def\xURL{URL\xspace}  
+
+
+
+\end{additionalmacros}
+
+
+
+
+
+
+
+%
+\begin{frontmatter}
+%\QUERY[1]
+
+
+
+
+
+
+
+
+
+
+
+
+
+\stmauorcid[Ahmad B. Usman]{0000-0001-6781-1420}
+\stmauorcid[Mikael Asplund]{0000-0003-1916-3398}
+\stmaucontribution[Mikael Asplund]{Writing -- review \& editing,
+Supervision,
+Funding acquisition,
+Conceptualization}
+
+\stmaucontribution[Ahmad B. Usman]{Writing -- review \& editing,
+Writing -- original draft,
+Visualization,
+Validation,
+Software,
+Methodology,
+Investigation,
+Data curation,
+Conceptualization}
+
+
+
+
+
+\title{Understanding security risks in update mechanisms of computing systems}
+
+
+
+%
+\addrai[1]{S0167404826001951-8882502cdbafe31a41dd6a62efb4fdc5} 
+\addrai[2]{S0167404826001951-cddf318ec765781a690574a577535272} 
+
+
+\begin{authorgroup}
+%\QUERY[2]
+\author{Ahmad B. Usman}[bio]
+\cormark[1]
+%\QUERY[3]
+\cortext[1]{\COR
+% \TFadd[\AffNum].
+}
+\email[ahmad.usman@liu.se]
+ 
+
+
+\author{Mikael Asplund}[bio]
+\email[mikael.asplund@liu.se]
+
+
+
+\affiliation{o={Department of Computer and Information Science, Link\"oping University}, c={Link\"oping}, cy={Sweden}}
+
+
+\end{authorgroup}
+
+\begin{abstractgroup}
+\begin{abstract}[1]
+This paper presents a study of update-related vulnerabilities based on a curated dataset of disclosures from the past decade.
+We analyze the exploitability, impact, and severity of these vulnerabilities, comparing them with the broader population of disclosed vulnerabilities.
+Our findings reveal that update-related vulnerabilities tend to be more severe and impactful, with a higher concentration of high-severity scores and a greater compromise of confidentiality, integrity, and availability. In contrast to general vulnerabilities, which are often network-exploitable, most update-related attacks require local access.
+We identify and categorize the most common weakness types in update mechanisms.
+We find that the most frequent weaknesses include authentication and authorization-related weaknesses, input-related weaknesses, path-related weaknesses, and certificate-related weaknesses.
+Furthermore, we introduce a rule-based approach with predefined keywords that assign vulnerabilities to six target-system classes.
+The classification relies on textual vulnerability descriptions together with vendor and product metadata.
+Finally, based on our analysis, we derive a set of clear mitigation recommendations to help secure update processes and reduce associated risks. 
+\end{abstract}
+
+
+
+\keywords{Secure updates \sep Software updates \sep Firmware updates \sep Vulnerability analysis \sep Target-system classification \sep Mitigation recommendations}
+
+
+
+
+
+
+\end{abstractgroup}
+\dataavailableat{Data availability}{The source code is publicly available at: \breakurlanywhere\associatedresource{https://github.com/abusm4n/updatOR}{https://github.com/abusm4n/updatOR}\defaultbreakurl}
+\end{frontmatter}
+
+
+
+
+
+
+
+
+%\BXHEAD[15]
+
+
+\section{Introduction}\xlabel{sec:intro}
+
+   
+
+
+
+
+
+Software and firmware updates are fundamental to the security and longevity of modern computing systems, from smart home IoT devices to enterprise systems and ubiquitous computing systems. 
+These updates, delivered remotely or applied locally, are intended to patch vulnerabilities, introduce new features, and ensure reliability across sectors such as healthcare, transportation, and critical infrastructure.
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+Despite their importance, the update process itself has emerged as a critical
+attack surface~\citep{294541}. Misconfigurations, insufficient security
+controls, and negligence in established best practices frequently expose update
+mechanisms to exploitation~\citep{10.1007/978-3-031-92886-4_7}. 
+The consequences can be severe, ranging from unauthorized access and data
+breaches to system failures. Additionally, several software update mechanisms
+lack proper security controls~\citep{268927,10.1109/MSP.2012.113}, do not
+adhere to established security practices~\citep{10.1007/978-3-031-30122-3_25},
+or fail to ensure consistency in the reporting of disclosed
+vulnerabilities~\citep{10.1007/978-3-032-02504-3_29}. 
+The global disruption caused by a faulty CrowdStrike update in July 2024, which triggered widespread system crashes across essential services, starkly illustrates the operational and security risks inherent in flawed update processes.
+
+
+
+
+
+  
+
+While prior research has proposed methods for securing
+updates \ubrk \citep{10.1145/3344948.3344972,8493602,294541}, vulnerabilities for
+software update deployments continue to increase, leading to financial, legal,
+and reputational damage. 
+
+
+
+  
+
+The goal of this paper is to present an empirical analysis framework for studying software and firmware update-related vulnerabilities.
+This includes vulnerabilities that compromise the integrity of the update, exploit update delivery, and vulnerabilities that arise from upgrade or downgrade procedures, or flaws in the management of the update mechanism.
+The term \emph{``update-related vulnerability''} is used to refer to a security flaw that resides within or directly affects the update process itself throughout this paper.
+The term \emph{``update process''} is used to cover all cases of over-the-air
+software and firmware updates (including upgrades or downgrades), while the
+term \emph{``overall''} refers to the complete set of vulnerabilities disclosed
+between 2016 and 2025 (past decade), drawn from the official CVE List
+repository~\citep{CVE_Program,CVE_List_V5}.
+After curating the dataset of update-related vulnerability disclosures, we analyze the frequency and severity of these vulnerabilities, their predominant attack vectors, the most common weakness classes and adversary capabilities, and representative exploitation scenarios.
+
+
+
+ 
+
+Additionally, we introduce a rule-based approach to classify vulnerabilities into six target-system classes (\texttt{Home, SCADA, Enterprise, Mobile, PC, Other}) using textual vulnerability descriptions with their corresponding vendor names and product metadata. 
+This classification (i) adds deployment context that is absent from raw CVE records, (ii) reveals that different system types exhibit distinct vulnerability patterns (e.g.,~Operational Technology (OT) in SCADA class is dominated by a memory-safety weakness rather than the authentication-related weaknesses prevalent in Information Technology (IT) classes), and (iii) enables targeted, class-aware risk prioritization for different groups.
+
+
+
+
+
+
+Finally,  we derive concrete recommendations for practitioners and maintainers to reduce the security risks inherent in update processes.
+
+
+ 
+ 
+
+Our results show that update-related vulnerabilities tend to be more impactful than the general population of disclosed vulnerabilities. 
+Additionally, the findings indicate that update-related vulnerabilities are primarily exploited locally, whereas overall vulnerabilities are more frequently exploited through network-based attacks.
+In summary, we make the following  contributions:
+
+
+
+\begin{itemize}
+    \item 
+    We present an in-depth analysis of software and firmware update vulnerabilities, comparing their exploitability patterns, impact, and severity, to general vulnerabilities observed over the past decade (cf. \xref{sec:result_rq1}).
+
+
+    \item We examine common update-related weaknesses and highlight representative cases, emphasizing how adversaries can leverage these vulnerabilities (cf. \xref{sec:result_rq2}).
+
+
+
+    
+
+
+
+    
+    \item 
+    We introduce a rule-based approach to categorize update-related vulnerabilities into different system classes, using textual descriptions together with vendor and product metadata (cf. \xref{sec:result_rq3}).
+
+
+    \item 
+    We propose a set of recommendation strategies designed to mitigate the root causes of update-related weaknesses and enhance system resilience (cf. \xref{sec:result_rq4}).
+    
+    \item 
+    We have made our implementation publicly available, together with a curated dataset and supporting analysis artifacts, for reproducibility and to encourage further research.\footnote{\myehost{https://github.com/abusm4n/updatOR}.}  
+
+\end{itemize}
+
+
+
+ 
+  
+    The remainder of this paper is organized as follows: 
+  \xref{sec:related_work} reviews related studies.
+ \xref{sec:methodology} describes our data collection process and methodology.
+ \xref{sec:result_rq1} presents an analysis of update-related vulnerabilities.
+ \xref{sec:result_rq2} provides an analysis of update-related weaknesses.
+ \xref{sec:result_rq3} outlines our rule-based approach for vulnerable target-systems.
+ \xref{sec:result_rq4} introduces the recommendation framework for secure updates.
+ \xref{sec:limitations_discussion} discusses the results, limitations, and future work.
+Finally,  \xref{sec:conclusion} concludes the paper.
+
+
+\section{Related Work}\xlabel{sec:related_work}
+
+Prior works have addressed various dimensions of update security, including
+firmware vulnerability detection~\citep{294541,10190484}, patch lifecycle
+analysis~\citep{10.1145/3133956.3134072}, and IoT update
+practices~\citep{10.1007/978-3-031-30122-3_25,10.1145/3560835.3564551}. The
+present work extends this line of inquiry by jointly analyzing both software
+and firmware update vulnerabilities across all computing system categories over
+the past decade.
+
+
+ 
+
+\cvpt\textbf{Software Update Vulnerabilities and Patch Lifecycle:}
+ Frank Li and Vern Paxson~\citep{10.1145/3133956.3134072} present an empirical
+study on security patches, 
+analyzing vulnerabilities across various open-source software projects. 
+The study integrates data from the National Vulnerability Database (NVD) to analyze the life cycle of security patches, focusing on vulnerability duration, patch timeliness, and fix reliability, but does not consider firmware vulnerabilities.
+\citet{10.1007/978-3-030-80825-9_11} highlight the risks associated with
+software updates, particularly their delays, which leave systems vulnerable.
+However, they focus on addressing the challenges of investigating update
+behaviors due to the lack of vendor release schedules and the difficulty of
+tracking user update installations, with data collection limited to three
+years.
+The authors in~\citet{8022734} present the impact of upgrading software
+vulnerabilities and their severity.
+Their primary aim is to propose a new method for assessing the vulnerability based on the CVSS.
+
+ 
+
+\cvpt\textbf{IoT Software Update Practices:}
+ \citet{10.1007/978-3-031-30122-3_25} examine the IoT
+software update landscape by analyzing IoT device traffic at the network level.
+The findings indicate that vendors are not adhering to security best practices.
+ The authors in~\citet{10.1145/3560835.3564551} study software update practices
+by analyzing User Agent strings in network traffic on four software components,
+namely \texttt{cURL, Wget, OkHttp}, and python-requests. 
+The findings reveal that IoT devices often run outdated and vulnerable versions, emphasizing that vendors frequently deploy older versions that fail to address critical CVEs. 
+However, their analysis focuses on plain-text HTTP traffic, which may not capture the complete software environment on IoT devices.
+
+ 
+
+\cvpt\textbf{Update Mechanisms and Recommendations:}
+The authors in~\citet{268927} present challenges related to software updates,
+along with recommendations for conducting secure updates. 
+However, their focus is mostly on operating systems, and their recommendations are generic rather than focused on addressing a particular weakness.
+\citet{10.1145/3605770.3625211} propose a mitigation method for detecting
+malicious updates. However, it relies solely on differential static analysis on open-source packages.
+\citet{10.1007/978-3-031-92886-4_7} present a preliminary
+empirical analysis of software and firmware update vulnerabilities, analyzing
+CVEs from 2016 to 2023, identifying six weakness categories and deriving a
+recommendation matrix; the present work extends that study with a larger
+dataset, revised weakness categories, and a new target-system classification.
+\citet{10.1007/s10207-026-01233-1} propose RASUES, a protocol that integrates
+secure software updates into the remote attestation process by extending a
+specification (RFC 9334), and demonstrate its feasibility on a TPM~2.0 embedded
+platform; this work complements our recommendation by providing a mechanism for
+verifying update integrity through attestation.
+
+ 
+
+\cvpt\textbf{Firmware Update Security:}
+ Recently,~\citet{294541} introduce a method to detect vulnerabilities in
+firmware updates.
+The authors argue that update procedures for firmware introduce new attack surfaces. 
+Through control-flow analysis, they identify and resolve the program execution
+paths during the update process.  In relation to our work, the authors
+identified the Top 10 firmware update-related weaknesses, some of which overlap
+with our findings; however, their study is limited in scope to firmware
+vulnerabilities.~\citet{10190484} conduct a systematic security analysis of
+firmware update mechanisms in IoT devices facilitated by a companion
+application. 
+They define a threat model, categorize potential security issues, and then analyze 23 popular IoT devices to identify vulnerabilities.
+Their results indicate that most of these devices are vulnerable due to the adoption of insecure firmware update mechanisms.
+~\citet{costin2014large} provide an analysis of firmware images. Through their
+analysis, new insights into the security of embedded devices were revealed.~\citet{10.1145/3560826.3563381} revisit the firmware
+upgrade challenge and present RoSym as a proposed solution. However, their
+study specifically focuses on building a symmetric key with the limitation of
+protecting only against DoS attacks.
+
+
+\section{Methodology}\xlabel{sec:methodology}
+
+
+
+
+  This section outlines the methodology employed in this study, including the formulation of the research questions, the sources of vulnerability data, the criteria used for selecting update-related vulnerabilities, the analysis of relevant security metrics, and the mapping of CVEs to CWEs to synthesize findings and evaluate the stated research questions. 
+The methodology comprises four phases, as shown in  \xref{fig:updator}.
+
+
+
+\begin{figure*}
+\caption{\xlabel{fig:updator}Overview of the methodology, showing the four study phases: 
+    (i) data collection and curation, 
+    (ii) core vulnerability analysis, 
+    (iii) target-system classification, 
+    and (iv) synthesis of mitigation recommendations.
+    }
+\includegraphics{gr1}
+\end{figure*}
+
+
+\subsection{Research Questions}
+
+
+To guide this study and structure our analysis, we investigate the following \textbf{Research Questions (RQs)}:
+
+\begin{itemize}
+    \item
+    \textbf{RQ1:}
+    How do update-related vulnerabilities differ from other general vulnerabilities in terms of their exploitability characteristics, impact on confidentiality, integrity, and availability, and their severity level?
+       To answer this question, we analyze vulnerabilities affecting update systems and compare them with the overall set of vulnerabilities disclosed over the past decade, identifying key similarities and differences across exploitability (such as attack vector and attack complexity), and impact with regards to confidentiality, integrity, and availability, and severity level distributions.
+
+
+
+   
+    \item
+    \textbf{RQ2:} 
+    What are the most common weaknesses underlying update-related vulnerabilities, and how do they compare to those observed in vulnerabilities overall?           We map update-related CVEs to their corresponding CWE categories to identify the most prevalent weaknesses and discuss their relevance, and show how attackers exploit them within software and firmware update processes.
+    
+
+    \item
+    \textbf{RQ3:}
+    Which target-system categories are most frequently affected by update-related vulnerabilities, and how does this distribution differ from the overall vulnerability dataset?
+    We classify vulnerabilities into six target-system categories using vulnerability description, vendor, and product metadata, then compare class distributions and model performance between update-related and overall datasets.
+    
+
+    \item
+    \textbf{RQ4:} 
+    What mitigation measures should be prioritized to reduce the risk of update-related vulnerabilities based on the identified weaknesses?
+         Drawing on our findings, we propose a recommendation matrix for secure update mechanisms, outlining practical mitigation strategies aimed at addressing the most critical and recurring update-related weaknesses.
+
+
+
+
+  
+\end{itemize}
+
+
+
+These research questions are important because update mechanisms are widely deployed and can have severe consequences when compromised. Investigating how update-related vulnerabilities differ from the broader vulnerability landscape (RQ1), identifying the most prevalent weaknesses (RQ2), and determining which target-system classes are most exposed (RQ3) provides empirical evidence for risk prioritization and helps guide the selection of appropriate mitigation measures (RQ4).
+
+
+The overall study methodology is illustrated in  \xref{fig:updator}, which provides an overview of four main phases.
+ In Phase 1, update-related vulnerabilities are identified from the official CVE repository using a keyword-based filtering strategy, followed by manual validation to remove false positives and produce a curated dataset of software and firmware update vulnerabilities (cf. \xref{subsec:data_collection}).
+Once data collection and curation are complete, the workflow proceeds to two phases.
+Phase 2 performs the core vulnerability analysis, where \texttt{CVSSv2/v3} metrics are extracted and compared against the overall population, and vulnerabilities are mapped to CWEs to identify dominant weakness patterns, which are subsequently grouped into five high-level weakness categories. 
+Phase 3 introduces a system that assigns each vulnerability to a target system class using a rule-based approach, resulting in a labeled dataset for downstream analysis, followed by evaluation and comparative analysis. 
+Finally, in Phase 4, the findings are synthesized by deriving mitigation recommendations from the identified weaknesses and constructing a recommendation matrix that directly addresses the observed update-related risks.
+These four phases are further explained in the following subsections.
+
+
+\subsection{Data Collection and Curation (\?Phase 1)}\xlabel{subsec:data_collection}
+
+
+We collected data from the CVE List official
+repository~\citep{CVE_Program,CVE_List_V5}.
+We downloaded vulnerability incidents disclosed and selected those from the past decade, as shown in  \xref{fig:cvelistV5}.
+We restrict our analysis to the period between 2016 and 2025, as recent vulnerabilities provide more precise scoring metrics and detailed information than older ones.
+We can see that there is an increasing number of vulnerabilities disclosed every year.
+
+
+To be consistent with the data in our experiments, the statistics in the figure are based on the vulnerability files found in the CVE List official repository (Commit ID: \texttt{174e04d}), and we used the repository so that we could pull new updates  done by the CVE developers.
+
+\nosubfloat[1]
+%%
+%%-------------------------------Author Instruction------------------------------%%
+%%  During production stage we have merged the below subfigures into a single    %%
+%%  figure for easier handling. If you want to update the figure, please upload  %%
+%%  a composite figure of all the subfigures including the replaced subfigure.   %%
+%%  However, if you still want to upload them as subfigures, then you may need   %%
+%%  to upload the rest of the figure parts as well. Filenames should be same as  %%
+%%  that we have mentioned in the \includegraphics{} commands. If you are        %%
+%%  uploading subfigures, please do not forget to comment out the command        %%
+%%  \nosubfloat which is given right at the top of this environment.             %%
+%%
+
+\begin{figure*}
+\caption{CVE counts per year: (a) all vulnerabilities and (b) update-related vulnerabilities.\xlabel{fig:overall_update_cve}}
+\subfloat[Overall CVE count per year.]{\includegraphics{gr2a}\xlabel{fig:cvelistV5}}
+\subfloat[Update-related CVE count per year.]{\includegraphics{gr2b}\xlabel{fig:sw_fw_dataset}}
+\end{figure*}
+
+
+
+
+
+\subsubsection{Extracting Update-related Vulnerabilities}\xlabel{subs_criteria}
+
+
+The extraction of update-related vulnerabilities was conducted using a semi-automated curation process combining keyword-based retrieval with manual validation. We first collected vulnerability records from 2016 to 2025, comprising a total of 243,610 vulnerabilities. 
+This full set constitutes the \emph{overall} baseline used in all comparisons throughout the paper; the update-related subset is extracted from it.
+The annual count of these overall vulnerabilities is shown in  \xref{fig:cvelistV5}.
+
+
+
+
+
+
+To identify candidates potentially related to software update vulnerabilities, we applied an automated keyword search over vulnerability descriptions. The query included terms associated with software and firmware updates and their execution phases.
+These keywords are: \texttt{software update}, \texttt{firmware update}, \texttt{software upgrade}, \texttt{firmware upgrade}, \texttt{update process}, \texttt{upgrade process}, \texttt{downgrade}, and \texttt{OTA update} or \texttt{over-the-air update}. 
+Other terms were excluded, such as \texttt{patch}, which appears pervasively in CVE descriptions to indicate that a fix has been issued (e.g.,~``a patch is available''), rather than to denote a vulnerability in the update process itself, and its inclusion would produce a large volume of false positives, as many CVEs may include it.
+The overall retrieval workflow is summarized in Phase 1  \xref{fig:updator}.
+
+
+\subsubsection{Manual Validation}
+
+Because these keywords may also appear in vulnerabilities unrelated to the update process, we performed a manual review of all retrieved entries to eliminate false positives. Each candidate vulnerability was evaluated against a set of predefined selection criteria to determine whether it genuinely affected the update mechanism. This step ensured that vulnerabilities sharing similar terminology but unrelated to update behavior were excluded from the final dataset.
+
+
+
+To investigate whether the keyword search may have missed update-related vulnerabilities (i.e.,~false negatives), we conducted a random-sample audit using a complementary set of \emph{secondary} terms not included in the original query, such as \texttt{FOTA}, \texttt{remote update}.
+We drew a random sample of records and manually inspected each description.
+Only a few entries seem to be update-related, for instance,
+\texttt{CVE-2016-10139} (com.adups.fota); however, the description of the vulnerability does not seem to fall within our selection criteria. 
+The remaining candidates matched remediation phrasing (e.g.,~``it is recommended to apply a patch'').
+Nonetheless, non-standard phrasing may not have been captured; this is an
+acknowledged limitation of any keyword-based search over free-text
+vulnerability descriptions~\citep{9723604} (cf.  \xref{subsec:limitations}).
+
+
+
+
+
+
+We categorized confirmed update-related vulnerabilities into two primary classes: software update-related and firmware update-related. When a vulnerability applied to both categories, it was assigned to the most appropriate class and removed from the other to avoid duplication and bias in subsequent analyses.
+
+
+For this study, a vulnerability is classified as update-related if it involves defects or malicious activity affecting the update process in one or more of the following ways:
+(i) compromising the integrity of the update itself, including tampered or malicious updates;
+(ii) exploitation during update application, such as man-in-the-middle attacks during update upload or download;
+(iii) vulnerabilities arising from upgrade or downgrade procedures; or
+(iv) flaws in the logic, permissions, or management of the update mechanism, including weak access controls or insecure update execution.
+
+
+
+
+
+
+
+ Conversely, vulnerabilities are excluded if exploitation occurs outside the update process itself. 
+For example, if an attacker compromises a system after an update is complete, it falls outside our paper's definition of an update-related vulnerability. 
+Similarly, we exclude cases where an update was provided to fix a security issue, or where an attacker exploits weaknesses in an application's standard operation or authentication mechanisms.
+
+
+After manual validation and the removal of false positives, we obtained a curated dataset of 892 vulnerabilities, of which 502 are related to software updates and 390 are related to firmware updates. 
+This dataset is used for the remainder of the analysis in this paper.
+
+
+We separate software vulnerabilities from firmware vulnerabilities due to their distinct nature during the update process. The former typically occur at the application layer, while the latter are embedded at lower-level system components, such as microcontroller firmware. 
+
+
+
+
+
+ \xref{fig:sw_fw_dataset} presents the temporal distribution of update-related vulnerabilities we find in our analysis. The figure shows a steady increase in reported update-related vulnerabilities over recent years, except in 2025. This deviation is likely because many vulnerabilities from the current year are still under review or have not yet been reported. Overall, this trend highlights the growing security relevance of update mechanisms and underscores the need for focused analysis in this domain.
+
+
+
+\begin{figure*}
+\caption{\xlabel{fig:cvss3_metrics}CVSS v3 Metrics and Sub-metrics.}
+\includegraphics{gr3}
+\end{figure*}
+
+
+
+
+\subsection{Core Vulnerability Analysis (\?Phase 2)}\xlabel{sub_selected_metrics}\xlabel{subsec:selected_metrics}
+
+
+
+
+
+
+
+    
+
+
+To investigate potential differences between update-related vulnerabilities and
+the overall vulnerabilities in terms of severity, we rely on the CVSS v3 base
+score metrics,  which are maintained and standardized by the Forum of Incident
+Response and Security Teams (FIRST)~\citep{FIRST-CVSSv3.1}.
+This methodology includes three main components: exploitability metrics, impact
+metrics, and severity calculation~\citep{FIRST-CVSSv3.1}, as illustrated in
+\xref{fig:cvss3_metrics}.
+
+
+\subsubsection{Selected Metrics}
+
+
+
+
+
+\cvpt\textbf{Exploitability Metrics:}
+quantify how easily a vulnerability can be exploited.
+The score is computed as: Exploitability
+$\text{}=8.22 \times AV \times AC \times PR \times UI$.
+Its component consists of five sub-metrics defined as follows:
+
+
+
+\begin{itemize}
+    \item
+    \textbf{Attack Vector (AV):}  Describes the means by which a vulnerability can be exploited, classified as Network (N), Adjacent Network (A), Local (L), or Physical (P). 
+         \item
+    \textbf{Attack Complexity (AC):}      Represents the difficulty of exploiting the vulnerability, categorized as Low (L) or High (H).
+         \item
+    \textbf{Privileges Required (PR):} 
+    Indicates the level of privileges an attacker must possess before exploitation, defined as None (N), Low (L), or High (H).
+         \item
+    \textbf{User Interaction (UI):} Specifies whether exploitation requires user involvement, either Required (R) or None (N).      \item
+    \textbf{Scope (S):}  Describes whether exploitation can impact components beyond the initially vulnerable one, classified as Unchanged (U) or Changed (C). 
+\end{itemize}
+
+
+ 
+
+
+
+
+
+
+
+
+\cvpt\textbf{Impact Metrics:}  capture the  consequences of a successful exploitation and consist of three sub-metrics:
+
+\begin{itemize}
+    \item
+    Confidentiality (C): Evaluates the extent to which sensitive information may be disclosed.
+    
+
+     \item 
+     Integrity (I): Measures the degree to which       resources can be modified, corrupted, or tampered with 
+     
+
+     \item
+     Availability (A): Assesses the impact on system availability, such as service disruption or denial of service.
+\end{itemize}
+
+
+
+
+ 
+
+
+\cvpt\textbf{Severity Metrics (Base Score):}
+ quantify the intrinsic severity of a vulnerability based on its impact and exploitability, depending on the Scope of the vulnerability. 
+
+
+The exploitability and impact characteristics are combined by CVSS to compute a numerical base score ranging from 0 to 10, representing the overall \textbf{severity} of the vulnerability.
+The resulting score is then mapped to qualitative severity levels: Low (0.1--3.9), Medium (4.0--6.9), High (7.0--8.9), and Critical (9.0--10.0). 
+
+
+
+
+
+
+
+
+
+
+
+
+
+To illustrate this, consider the update-related vulnerability \texttt{CVE-2025-56513}, which is assigned the vector string
+\texttt{CVSS:3.1/AV:} \ubrk \texttt{N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H}.
+This indicates that the vulnerability is remotely exploitable over the network, has low attack complexity, requires no privileges or user interaction, and has a high impact on confidentiality, integrity, and availability. 
+
+
+
+
+
+In cases where CVSS v3 scores are unavailable, we rely on the corresponding CVSS v2 scores. Although both versions assess vulnerability severity using exploitability and impact dimensions, CVSS v3 
+ replaces the Authentication metric with Privileges Required, explicitly models User Interaction and Scope, and extends the Attack Vector to include physical access. 
+In addition, CVSS v2 represents impact using coarse None/Partial/Complete levels, whereas CVSS v3 adopts more granular None/Low/High assessments for confidentiality, integrity, and availability. 
+Despite these structural differences, 
+ the use of CVSS v2 scores does not materially affect the aggregate trends or conclusions of our analysis.
+
+
+
+All metrics of exploitability, impact, severity, and weakness are extracted
+from the CVE List repository~\citep{CVE_Program,CVE_List_V5} for the overall
+dataset, applying the same experiments to the update-related subset, enabling a
+direct, like-for-like comparison.
+
+
+\subsubsection{Mapping {\?{CVE}}s to {\?{CWE}}s}\xlabel{subsec:selected_mapping}
+
+
+
+To quantify the prevalence of different vulnerability types in our dataset, we employ a formal mapping between CVEs and CWEs. 
+Let $\mathcal{J}$ represent the set of all CVEs in our analysis, and let $\mathcal{I}$ represent the set of all CWE identifiers present in the dataset. 
+For each CWE $i \in \mathcal{I}$, we compute $N_i$, the total number of CVEs associated with that specific weakness type.
+This relationship is captured using a binary indicator variable $e_{ij}$, defined as:
+\begin{equation}
+N_i = \sum_{j \in \mathcal{J}} e_{ij}, \quad 
+    e_{ij} =
+\begin{cases}
+1, & \text{if CVE } j \text{ maps to CWE } i \\
+      0, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+
+
+
+
+
+
+Note that some vulnerabilities in the dataset are associated with more than one value of exploitability, impact, and base score; this is because some CVEs have multiple versions affected. For this reason, we opted to consider the most critically affected versions.
+
+
+\subsection{Target-system Classification (\?Phase 3)}
+
+
+To classify CVEs according to their target systems, we adopt the classification
+scheme proposed in~\citet{10.1007/978-3-030-48256-5_9}, which divides systems
+into six classes based on their target deployment environment:
+
+\begin{itemize}
+
+\item \textbf{Home:} Consumer devices, including smart TVs, home routers, smart appliances, and household IoT devices.
+
+\item \textbf{SCADA:} Operational technology (OT) and industrial control systems (ICS), including SCADA components, automation controllers, and Remote Terminal Units (RTUs).
+
+\item \textbf{Enterprise:} Enterprise and service-provider infrastructure, including data-center systems, network and security appliances, and cloud platform components.
+
+\item \textbf{Mobile:} Mobile and wearable platforms, including smartphones, tablets, and smartwatches.
+
+\item \textbf{PC:} End-user general-purpose computing systems, including desktops, laptops, and workstation hosts.
+
+\item \textbf{Other:} Devices and systems that do not clearly fit the above classes, including mixed-purpose peripherals and niche or specialized platforms.
+
+\end{itemize}
+
+
+Of these six classes, \textbf{SCADA} belongs exclusively to the  OT domain, while \textbf{Home}, \textbf{Enterprise}, \textbf{Mobile}, and \textbf{PC} fall within the IT domain. 
+This distinction is important because OT and IT systems differ in their security practices, update lifecycles, and regulatory requirements; OT systems in particular are governed by domain-specific norms that do not apply to conventional IT environments. 
+The \textbf{Other} class may encompass devices from either domain.
+
+
+This categorization provides a structured basis for mapping vulnerabilities to target systems and enables more precise vulnerability analysis and risk assessment across heterogeneous environments.
+
+
+\subsubsection{Rule-based Approach}\xlabel{sec:rule_based}
+
+We implement a rule-based classifier as an interpretable baseline. For each of the six target-system classes, we define a set of regular expression patterns derived from the characteristic vocabulary associated with that class. 
+
+
+The patterns are constructed by inspecting a random sample of CVE descriptions and are organized around the following semantic groups.
+\textbf{Home:}  
+Patterns target consumer-grade connected devices, including smart-home appliances (\textit{smart thermostat}, \textit{smart lock}, \textit{home automation}),  networking equipment (\textit{router}, \textit{wireless access point}), IP cameras and baby monitors, home entertainment systems (\textit{smart TV}, \textit{streaming device}, \textit{gaming console}), and well-known consumer vendors (e.g.\ TP-Link, D-Link).
+\textbf{SCADA:}  
+Patterns capture industrial and operational technology terminology, including control-system acronyms (\textit{SCADA}, \textit{ICS}, \textit{PLC}, \textit{HMI}, \textit{RTU}).
+\textbf{Enterprise:}  
+Patterns identify enterprise-grade infrastructure, including network and security appliances (\textit{firewall}, \textit{VPN}, \textit{switch}, \textit{load balancer}), server and cloud platforms (\textit{data center}, \textit{cloud infrastructure}), and major enterprise vendors (e.g.\ Cisco, Juniper, Fortinet, VMware, Oracle).
+\textbf{Mobile:}  
+Patterns match mobile and wearable platforms, including identifiers such as \textit{Android}, \textit{iOS}, \textit{iPhone}, and \textit{iPad}, distribution channels (\textit{Google Play}, \textit{App Store}), and wearable devices (\textit{smartwatch}, \textit{fitness tracker}).
+\textbf{PC:}  
+Patterns capture personal and general-purpose computing systems, including device form factors (\textit{desktop}, \textit{laptop}, \textit{personal computer}), desktop operating systems (\textit{Windows}, \textit{Linux}, \textit{macOS}, \textit{Ubuntu}, \textit{Debian}, \textit{Red Hat}), hardware components (\textit{CPU}, \textit{GPU}, \textit{SSD}), and common PC software (\textit{Microsoft Office}, \textit{antivirus}).
+
+
+
+
+The classifier assigns scores to each class based on case-insensitive regex matches in the vulnerability description. 
+To prioritize stronger signals, matches are weighted as follows:  multi-token patterns (i.e.,~patterns that contain a space) receive a weight of 3, while single-token patterns receive a weight of 2.
+
+
+
+
+
+
+To reduce the number of vulnerabilities assigned to the \textit{Other} class and to capture manufacturer-specific signals, we extend the approach by using vendor and product metadata extracted from the \texttt{affected} field of the CVE record. 
+
+These checks are cumulative: a vendor-name match against a curated per-class list contributes~$+3$, a product-keyword match in the product field contributes~$+2$, and a product-keyword match in the description contributes~$+1$, so a CVE can accumulate points from all three sources.
+In addition, the description-only score computed in the previous step is also carried forward as a soft vote: if it assigned a class other than \textit{Other}, that class receives an additional~$+2$.
+The class with the highest total score is selected, provided the score reaches the decision threshold (${\geq}2$); otherwise, the vulnerability is labeled \textit{Other}.
+The complete rule-based approach is available in the accompanying artifact.
+
+
+\section{Update-related Vulnerabilities  ({\?{RQ}}1)}\xlabel{sec:result_rq1}
+
+
+
+
+
+
+ This section synthesizes the update-related vulnerabilities in order to answer \textbf{RQ1}, to determine whether there are notable differences between update-related vulnerabilities and other types of vulnerabilities.  
+We analyzed update-related vulnerabilities to characterize exploitation methods in terms of attack vectors, attack complexity, required privileges, user interaction, and scope, as well as their impact on confidentiality, integrity, and availability, and overall severity. We then compare these findings with those of all reported vulnerabilities over the past decade.
+    
+
+
+
+
+
+
+
+
+
+For a structured presentation of our results, we adopt the organization illustrated in  \xref{fig:cvss3_metrics} and grounded in the CVSS v3 framework (cf.  \xref{sub_selected_metrics}). 
+Specifically, we first analyze exploitability, then impact, and finally severity.
+
+
+\subsection{Exploitability}
+
+
+
+To assess exploitability, we first present the distributions of attack vectors and attack complexities for software update vulnerabilities, firmware update vulnerabilities, and the overall vulnerability set, as shown in  \xref[env=Figs. ]{fig:attack_metrics_sw},  \nxref{fig:attack_metrics_fw}, and \nxref{fig:attack_metrics_overall}.
+
+
+Our analysis shows that software update vulnerabilities are predominantly exploited through local attack vectors, followed by network, adjacent-network, and physical vectors.
+Conversely, in the overall vulnerabilities, network-based exploitation is the most prevalent, with local, adjacent-network, and physical attacks occurring less frequently.
+Notably, the distributions of attack complexity exhibit similar patterns across update-related vulnerabilities and the overall vulnerability set.
+
+
+
+To further assess exploitability, we present the remaining three sub-metrics (Privileges Required, User Interaction, and  Scope), illustrating their distributions for update-related and the overall vulnerability set in  \xref{fig:cve_metrics_pr_ui_s_both,fig:cve_metrics_pr_ui_s_overall}.
+For update-related vulnerabilities (\xref{fig:cve_metrics_pr_ui_s_both}), user interaction is less frequently required, while the distribution of privileges required remains broadly comparable to that of the overall vulnerability set. Together with the predominance of local attack vectors, this makes update-related vulnerabilities particularly attractive targets in practice. 
+While Scope changes are less common, their presence indicates that some update vulnerabilities could affect components beyond the directly targeted system.
+In contrast, the overall vulnerability set (\xref{fig:cve_metrics_pr_ui_s_overall}) exhibits a more varied distribution. User interaction and Scope changes occur more frequently than in update-related vulnerabilities, although the differences are proportional rather than absolute. Privilege requirements are generally similar between the two sets.
+Therefore, update-related vulnerabilities appear easier to exploit in practice than the overall vulnerability population.
+
+
+
+%%
+%%-------------------------------Author Instruction------------------------------%%
+%%  During production stage we have merged the below subfigures into a single    %%
+%%  figure for easier handling. If you want to update the figure, please upload  %%
+%%  a composite figure of all the subfigures including the replaced subfigure.   %%
+%%  However, if you still want to upload them as subfigures, then you may need   %%
+%%  to upload the rest of the figure parts as well. Filenames should be same as  %%
+%%  that we have mentioned in the \includegraphics{} commands. If you are        %%
+%%  uploading subfigures, please do not forget to comment out the command        %%
+%%  \nosubfloat which is given right at the top of this environment.             %%
+%%
+
+\begin{figure*}[,abovefloat=45pt,belowfloat=35pt]
+\caption{\xlabel{fig:attack_metrics_all}Attack metrics for software updates, firmware updates, and overall vulnerabilities.}
+\subfloat[Software Updates Attack Metrics.]{\xlabel{fig:attack_metrics_sw}\includegraphics{gr4a}}
+\subfloat[Firmware Updates Attack Metrics.]{\xlabel{fig:attack_metrics_fw}\includegraphics{gr4b}}
+\subfloat[Overall Attack Metrics.]{\xlabel{fig:attack_metrics_overall}\includegraphics{gr4c}}
+        
+\end{figure*}
+
+
+\begin{figure*}[,belowfloat=25pt]
+\caption{\xlabel{fig:cve_metrics_pr_ui_s_both}Update-related vulnerability distribution by privileges required, User interaction, and Scope.}
+                   
+\includegraphics{gr5}
+        
+\end{figure*}
+
+
+\begin{figure*}[,belowfloat=25pt]
+\caption{\xlabel{fig:cve_metrics_pr_ui_s_overall}Overall vulnerability distribution by privileges required, User interaction, and Scope.}
+                   
+\includegraphics{gr6}
+        
+\end{figure*}
+
+
+%%
+%%-------------------------------Author Instruction------------------------------%%
+%%  During production stage we have merged the below subfigures into a single    %%
+%%  figure for easier handling. If you want to update the figure, please upload  %%
+%%  a composite figure of all the subfigures including the replaced subfigure.   %%
+%%  However, if you still want to upload them as subfigures, then you may need   %%
+%%  to upload the rest of the figure parts as well. Filenames should be same as  %%
+%%  that we have mentioned in the \includegraphics{} commands. If you are        %%
+%%  uploading subfigures, please do not forget to comment out the command        %%
+%%  \nosubfloat which is given right at the top of this environment.             %%
+%%
+
+\begin{figure*}
+\caption{\xlabel{fig:cia_all}Impact on confidentiality, Integrity, and availability for update-related and overall vulnerabilities.}
+\subfloat[Update-related Impact.]{\xlabel{fig:cia_both}\includegraphics{gr7a}}
+\subfloat[Overall Impact.]{\xlabel{fig:cia_overall}\includegraphics{gr7b}}
+        
+\end{figure*}
+
+
+\subsection{Impact}
+
+
+
+To evaluate the impact of update-related vulnerabilities, we present violations of confidentiality, integrity, and availability.
+ \xref{fig:cia_both,fig:cia_overall} present a comparative analysis of the impact of vulnerabilities on the confidentiality, integrity, and availability triad. 
+ \xref{fig:cia_both} focuses exclusively on update-related vulnerabilities, while  \xref{fig:cia_overall} summarizes the overall vulnerabilities.
+
+For update-related vulnerabilities, the results show a pronounced concentration of high-impact violations across all three dimensions. 
+Specifically, confidentiality is most severely affected, with the majority of update-related vulnerabilities exhibiting a high confidentiality impact, substantially outweighing those with low or no impact. 
+A similar trend is observed for integrity, where high-impact violations dominate.
+Availability is likewise heavily impacted, with vulnerabilities classified as having high availability impact, reflecting the potential for denial-of-service or persistent system disruption through malicious updates. 
+
+
+In contrast, the overall vulnerability set in \xref{fig:cia_overall} shows a more balanced distribution across the high, low, and no-impact categories for confidentiality, integrity, and availability. 
+Although the absolute number of high-impact vulnerabilities is larger due to the size of the dataset, high-impact cases do not dominate uniformly across all dimensions. 
+For example, while confidentiality shows a substantial number of high-impact vulnerabilities, integrity and availability impacts are more evenly spread between high, low, and none categories, suggesting a less consistently severe security posture across general vulnerabilities. 
+
+
+
+
+
+
+\tabref{tab:cia_both+overall} compares the distribution of impact levels for confidentiality, integrity, and availability between update-related vulnerabilities and the overall vulnerability set. The color intensity highlights increasing severity from none to critical, enabling a direct visual comparison of impact concentration across categories.
+
+
+Across all three impact dimensions, update-related vulnerabilities are dominated by high-severity impacts. 
+For confidentiality, 66.4\% of update-related vulnerabilities are classified as high impact, with an additional 2.0\% reaching critical severity. 
+Integrity exhibits a nearly identical pattern, with 65.5\% high-impact and 2.0\% critical cases. Availability is likewise severely affected, with 61.8\% of update-related vulnerabilities rated as high impact and 2.0\% as critical, reflecting the potential for widespread service disruption or permanent system disablement through malicious or faulty updates.
+
+In contrast, the overall vulnerability set shows a lower distributed impact profile. 
+High-impact cases account for only 39.4\% (confidentiality), 33.0\% (integrity), and 36.6\% (availability), while a larger fraction of vulnerabilities fall into the low or no-impact categories.
+Notably, the proportion of vulnerabilities with no impact is consistently higher in the overall dataset, reaching 37.1\% for availability, compared to 28.1\% for update-related vulnerabilities.
+
+This comparison demonstrates that update-related vulnerabilities are more  impactful and  severe than the general  vulnerability population.
+
+
+\subsection{Severity}
+
+
+The severity distributions of update-related vulnerabilities and overall vulnerabilities are compared using both relative percentages and absolute counts, as shown in  \xref{fig:cve_severity_both,fig:cve_severity_overall}.
+While the overall dataset is substantially larger in volume, the update-related subset exhibits a markedly more severe and tightly clustered impact profile.
+
+
+As shown in  \xref{fig:cve_severity_both}, update-related vulnerabilities have higher severity vulnerabilities constitute the largest share (44.6\%), followed by critical vulnerabilities (11.2\%), resulting in more than half of update-related vulnerabilities (55.8\%) being classified as high or critical. Medium-severity cases account for 40.7\%, while low-severity vulnerabilities are rare (3.5\%), indicating a limited presence of benign or low-risk update flaws.
+
+In contrast, the overall vulnerability distribution shown in  \xref{fig:cve_severity_overall} is centered on medium-severity cases (49.2\%), with high-severity vulnerabilities representing a smaller fraction (35.9\%) and critical cases accounting for only 8.3\%. 
+Low-severity vulnerabilities are also more prevalent in the overall dataset (6.7\%), reflecting a broader and less concentrated severity profile. 
+Taken together, only 44.2\% of all vulnerabilities fall into the high or critical categories, compared to nearly 56\% for update-related vulnerabilities.
+
+The absolute counts further reinforce this contrast. Despite the comparatively small number of update-related vulnerabilities, their severity is disproportionately high, with critical and high cases dominating the distribution relative to low-severity ones. 
+
+
+Overall, these findings demonstrate that update-related vulnerabilities tend to be more severe than vulnerabilities in general.
+
+\begin{table*}[hline]
+\caption{\xlabel{tab:cia_both+overall}Update-related vs. Overall vulnerability impact metrics comparison. \textbf{Bold} \# Indicates update-related more critical and higher.}
+\bstmfloatsrc
+\begin{fsrc}
+\tblfont
+\begin{tabular*}{365pt}{@{}l|ccccc|ccccc@{}}
+\toprule
+\textbf{Impact} & \multicolumn{5}{c}{\textbf{Update-related \% }} & \multicolumn{5}{c}{\textbf{Overall \% }} \\ 
+\cmidrule(lr){2-6} \cmidrule{7-11} 
+& \textbf{Critical$^{v2}$} & \textbf{High} & \textbf{Partial$^{v2}$} & \textbf{Low} & \textbf{None} & \textbf{Critical$^{v2}$} & \textbf{High} & \textbf{Partial$^{v2}$} & \textbf{Low} & \textbf{None} \\ 
+\midrule
+\textbf{Confidentiality} & 
+  \cellcolor{red!90}\textbf{2.0} & 
+  \cellcolor{red!60}\textbf{66.4} & 
+  \cellcolor{orange!40}0.9 & 
+  \cellcolor{yellow!20}10.5 &
+  
+  \cellcolor{blue!10}20.2 & 
+  \cellcolor{red!90}0.7 & 
+  \cellcolor{red!60}39.4 & 
+  \cellcolor{orange!40}4.5 & 
+  \cellcolor{yellow!20}32.5 & 
+  \cellcolor{blue!10}23.0 \\ 
+
+\textbf{Integrity} & 
+  \cellcolor{red!90}\textbf{2.0} & 
+  \cellcolor{red!60}\textbf{65.5} & 
+  \cellcolor{orange!40}0.9 & 
+  \cellcolor{yellow!20}14.7 & 
+  \cellcolor{blue!10}16.9 & 
+  \cellcolor{red!90}0.7 & 
+  \cellcolor{red!60}33.0 & 
+  \cellcolor{orange!40}5.6 & 
+  \cellcolor{yellow!20}35.9 & 
+  \cellcolor{blue!10}24.8 \\ 
+
+\textbf{Availability} & 
+  \cellcolor{red!90}\textbf{2.0} & 
+  \cellcolor{red!60}\textbf{61.8} & 
+  \cellcolor{orange!40}0.7 & 
+  \cellcolor{yellow!20}7.3 & 
+  \cellcolor{blue!10}28.1 & 
+  \cellcolor{red!90}0.8 & 
+  \cellcolor{red!60}36.6 & 
+  \cellcolor{orange!40}4.4 & 
+  \cellcolor{yellow!20}21.2 & 
+  \cellcolor{blue!10}37.1 \\ 
+\bottomrule
+\end{tabular*}
+\legend{\textbf{Note:} {Critical$^{v2}$ and Partial$^{v2}$ impact  belongs to CVSSv2 metrics, detailed for \%completeness.}}
+\end{fsrc}
+\estmfloatsrc
+\end{table*}
+
+
+
+%%
+%%-------------------------------Author Instruction------------------------------%%
+%%  During production stage we have merged the below subfigures into a single    %%
+%%  figure for easier handling. If you want to update the figure, please upload  %%
+%%  a composite figure of all the subfigures including the replaced subfigure.   %%
+%%  However, if you still want to upload them as subfigures, then you may need   %%
+%%  to upload the rest of the figure parts as well. Filenames should be same as  %%
+%%  that we have mentioned in the \includegraphics{} commands. If you are        %%
+%%  uploading subfigures, please do not forget to comment out the command        %%
+%%  \nosubfloat which is given right at the top of this environment.             %%
+%%
+
+\begin{figure*}[,belowfloat=15pt]
+\caption{Severity distribution and absolute counts for update and overall vulnerabilities (C:Critical, H:High, M:Medium, L:Low).\xlabel{fig:cve_severity_all}}
+    \subfloat[Update-related Severity.]{\includegraphics{gr8a}\xlabel{fig:cve_severity_both}}
+\subfloat[Overall Severity.]{\includegraphics{gr8b}\xlabel{fig:cve_severity_overall}}
+\end{figure*}
+
+
+
+
+
+\section{Update-related \?Weaknesses ({\?{RQ}}2)}\xlabel{sec:result_rq2}
+
+
+This section identifies the weaknesses most frequent in update-related vulnerabilities and compares them with those observed overall to address \textbf{RQ2} (What are the most common weaknesses of update-related vulnerabilities?). 
+It further explains how these weaknesses can be exploited and outlines
+realistic scenarios in which such attacks may occur. Several of the identified
+weaknesses were classified by MITRE as Top 25, Stubborn, or Most Dangerous
+weaknesses in 2023~\citep{CWE_Top25_2023}.
+
+
+
+
+
+By analyzing the metric fields used to map CVEs to CWEs (cf. \xref{subsec:selected_metrics}), we extracted the most frequently reported weaknesses associated with the update process. 
+\tabref{tab:cwe_update_vs_overall}  summarizes the ten most commonly exploited update-related weaknesses and compares them with the most prevalent weaknesses overall.
+
+
+
+To structure the analysis, we group related weaknesses into five categories based on the highest severity: Authentication-related Weaknesses (ARW),  Authorization-related Weaknesses (AuzRW), Input- \ubrk related Weaknesses (IRW), Path control-related Weaknesses (PRW), and Certificate-related Weaknesses (CRW). 
+Each group is highlighted using a distinct color in the table, as   illustrated in  \xref{fig:group_weaknesses}.
+%\QUERY[4]
+
+The results show that ARW dominates update-related vulnerabilities. 
+IRW is the second most common, followed by AuzRW, PRW, and CRW.
+
+
+
+In contrast, Cross-Site Scripting (XSS) and SQL injection are more strongly associated with vulnerabilities in the overall dataset rather than in update-specific cases.
+
+
+
+The Top 10 proportion $\oplus$ is 37.38\% for update-related vulnerabilities, compared to 44.35\% for the overall dataset, as shown in \tabref{tab:cwe_update_vs_overall}.
+
+
+The following sections provide further context on how these weaknesses arise during the update process and present real-world examples from our curated dataset to demonstrate the impact and attacker capabilities enabled by these vulnerabilities.
+
+\begin{table*}
+\caption{\xlabel{tab:cwe_update_vs_overall}Top 10 weaknesses of Update-related vs. Overall vulnerabilities.}
+\bstmfloatsrc
+\begin{fsrc}
+\tblfont
+\begin{tabular*}{375pt}{@{}c|llll|llll@{}}
+\toprule
+\textbf{\#}  & \multicolumn{4}{c}{\textbf{Update-Related}} 
+ & \multicolumn{4}{c}{\textbf{Overall}} \\
+\cmidrule(lr){2-5} \cmidrule{6-9}
+
+
+& \textbf{CWE-ID} 
+& \textbf{Related issue} 
+&\textbf {\%} 
+& \textbf{$\oplus$\%} 
+&\textbf {CWE-ID} 
+& \textbf{Related issue} 
+&\textbf {\%} 
+& \textbf{$\oplus$\%}  \\
+\midrule
+
+1 &
+\cellcolor{red!20}CWE-347 &
+\cellcolor{red!20}\textbf{Cryptographic Signature} &
+\cellcolor{gray!40}6.73 &
+6.73 &
+
+CWE-79 &
+\textbf{Cross-site Scripting} &
+\cellcolor{gray!40}15.5 &
+15.5 \\
+
+2 &
+\cellcolor{red!20}CWE-306 &
+\cellcolor{red!20}\textbf{Authentication} &
+\cellcolor{gray!40}4.67 &
+11.40 &
+
+CWE-89 &
+\textbf{SQL Injection} &
+\cellcolor{gray!40}6.79 &
+22.29  \\
+
+3 &
+\cellcolor{red!20}CWE-345 &
+\cellcolor{red!20}\textbf{Data Authenticity} &
+\cellcolor{gray!40}4.11 &
+15.51 &
+
+CWE-352 &
+\textbf{Cross-Site Request Forgery} &
+\cellcolor{gray!40}3.48 &
+25.77  \\
+
+4 &
+\cellcolor{blue!12}CWE-78 &
+\cellcolor{blue!12}\textbf{OS Command Injection} &
+\cellcolor{gray!40}4.11 &
+19.62 &
+
+\cellcolor{orange!30}CWE-862 &
+\cellcolor{orange!30}\textbf{Missing Authorization} &
+\cellcolor{gray!40}3.30 &
+29.07  \\
+
+5 &
+\cellcolor{red!20}CWE-494  &
+\cellcolor{red!20}\textbf{Integrity Check} &
+\cellcolor{gray!40}3.74 &
+23.36 &
+
+CWE-787 &
+\textbf{Out-of-bounds Write} &
+\cellcolor{gray!40}2.74 &
+31.81  \\
+
+6 &
+\cellcolor{blue!12}CWE-20 &
+\cellcolor{blue!12}\textbf{Input Validation} &
+\cellcolor{gray!40}3.18 &
+26.54 &
+
+\cellcolor{blue!12}CWE-20 &
+\cellcolor{blue!12}\textbf{Input Validation} &
+\cellcolor{red!60}\cellcolor{gray!40}2.74 &
+34.55 \\
+
+7 &
+\cellcolor{green!12}CWE-427 &
+\cellcolor{green!12}\textbf{Path Element} &
+\cellcolor{gray!40}2.80 &
+29.34 &
+
+CWE-125 &
+\textbf{Out-of-bounds Read} &
+\cellcolor{gray!40}2.61 &
+37.16  \\
+
+8 &
+\cellcolor{orange!30}CWE-863 &
+\cellcolor{orange!30}\textbf{Incorrect Authorization} &
+\cellcolor{gray!40}2.80 &
+32.14 &
+
+\cellcolor{gray!20}CWE-22 &
+\cellcolor{gray!20}\textbf{Path Traversal} &
+\cellcolor{gray!40}2.50 &
+39.66  \\
+
+9 &
+\cellcolor{orange!30}CWE-200 &
+\cellcolor{orange!30}\textbf{Unauthorized Actor} &
+\cellcolor{gray!40}2.62 &
+34.76 &
+
+
+\cellcolor{orange!30}CWE-284 &
+\cellcolor{orange!30}\textbf{Access Control} &
+\cellcolor{gray!40}2.39 &
+42.05  \\
+
+10 &
+\cellcolor{gray!20}CWE-295 &
+\cellcolor{gray!20}\textbf{Certificate Validation} &
+\cellcolor{gray!40}2.62 &
+37.38 &
+
+
+\cellcolor{blue!12}CWE-74 &
+\cellcolor{blue!12}\textbf{Injection} &
+\cellcolor{gray!40}2.30  &
+44.35 \\
+\bottomrule
+\end{tabular*}
+\end{fsrc}
+\estmfloatsrc
+\end{table*}
+
+
+\begin{figure}[,belowfloat=5pt]
+\caption{\xlabel{fig:group_weaknesses}Grouping weaknesses into five closely-related categories. \uscoltext}
+\includegraphics{gr9}
+\end{figure}
+
+
+\subsection{Authentication-related \?Weaknesses ({\?{ARW}})}
+
+Authentication-related weaknesses are the most prominent category in update-related vulnerabilities. 
+This group includes four recurring weaknesses that undermine the authenticity and integrity of software updates.
+Improper Verification of Cryptographic Signature (CWE-347),
+Missing Authentication for Critical Function (CWE-306), 
+Insufficient Verification of Data Authenticity (CWE-345),   and 
+Download of Code Without Integrity Check (CWE-494):
+
+These weaknesses occur when a product fails to properly verify the authenticity or origin of update-related data. 
+This includes missing or incorrect verification of cryptographic signatures, as well as the execution of update code obtained from untrusted sources.
+
+
+In the context of software updates, such weaknesses typically arise when a device either does not verify or incorrectly verifies the authenticity of the update binary. 
+This may occur during the download phase or before deploying an update that already resides on the device.
+For example, in \texttt{CVE-2023-4589} \texttt{-> (CWE-345)}, the digital signature is absent, and update integrity is not verified during the update process. 
+Similarly, in \texttt{CVE-2016-6567} \texttt{-> (CWE-494)}, the download manager fails to validate the authenticity of the firmware before execution, enabling an attacker to inject a malicious update, replace the operating system, or gain root privilege and execute arbitrary code.
+
+
+\subsection{Input-related \?Weaknesses  ({\?{IRW}})}
+
+Input-related weaknesses are the second major class observed in update workflows. 
+They include two groups.
+Improper Input  Validation (CWE-20), 
+Improper Neutralization of Special Elements used in an OS Command (`OS Command Injection') (CWE-78):
+These weaknesses occur when update parameters, metadata, or command inputs are not sufficiently validated before processing.
+
+
+In update mechanisms, this typically involves insufficient validation of raw input data, such as parameters, strings, or firmware metadata, during the upload or download of updates. 
+For instance, in \texttt{CVE-2017-6759} \texttt{-> (CWE-20)}, the update mechanism \texttt{(UpgradeManager)} is vulnerable due to inadequate input validation, allowing manipulation of the upgrade package. 
+Similarly,  \texttt{CVE-2025-52379} \texttt{-> (CWE-78)} affects the firmware update feature via the \texttt{upgradeFileName} parameter, leading to OS command injection and enabling attackers to write arbitrary files or execute remote code.
+
+
+\subsection{Authorization-related \?Weaknesses (\?{AuzRW})}
+
+
+Authorization-related weaknesses represent the third most prominent category in update-related vulnerabilities. 
+This group consists of 
+Incorrect Authorization (CWE-863) and 
+Exposure of Sensitive Information to an Unauthorized Actor (CWE-200):
+These weaknesses arise when authorization checks are missing, incorrectly implemented, or insufficiently enforced, resulting in unauthorized access to protected resources or sensitive information.
+
+
+In the context of software updates, such weaknesses occur when update mechanisms fail to properly restrict access to update-related functionality or data, allowing unauthorized actors to interact with the update process or retrieve sensitive information. 
+For example, in \texttt{CVE-2024-48792} \texttt{-> (CWE-863)} and \texttt{CVE-2024-48799} \texttt{-> (CWE-200)}, flaws in the firmware update process enable remote adversaries to access sensitive information without proper authorization. 
+Similarly, in \texttt{CVE-2024-39352} (\texttt{CWE-863}), an attacker can bypass authorization checks for the firmware upgrade feature with root privileges.
+
+
+\subsection{Path control-related \?Weaknesses ({\?{PRW}})}
+  
+Only one CWE category is classified under path control-related weaknesses. 
+%have  for update-related weaknesses.
+Uncontrolled Search Path Element (CWE-427):
+These weaknesses arise when a product constructs file paths using externally influenced input without adequately sanitizing special path elements, or when it relies on fixed search paths that can partially be controlled by an adversary. 
+
+In the context of software updates, such weaknesses occur when a device does not ensure that update files are downloaded to or accessed from the intended directory hierarchy. 
+This can be caused by uncontrolled search paths or insufficient filtering of path elements. 
+Update mechanisms often retrieve update data through multiple access paths, one or more of which may be attacker-controlled. For example, in \texttt{CVE-2023-32660}  \texttt{-> (CWE-427)}, the firmware update utility uses an uncontrolled search path, enabling an attacker to manipulate file locations and escalate privileges.
+
+
+\subsection{Certificate-related \?Weaknesses ({\?{CRW}})}
+
+Only one CWE category falls under certificate-related weaknesses.
+Improper Certificate Validation (CWE-295):
+These weaknesses occur when a product fails to correctly validate digital certificates, thereby assigning trust to outdated certificates.
+
+In the context of software updates, this typically occurs when certificates used to authenticate update servers or validate update packages are not properly verified. For instance, in \texttt{CVE-2022-3913} \texttt{-> (CWE-295)}, the update download process fails to validate server certificates, allowing an attacker to perform a man-in-the-middle attack and escalate privileges.
+While certificate-related weaknesses share similarities with authentication-related weaknesses, we treat them as a distinct category due to the specialized management of certificates and their role in mitigation strategies, particularly those involving remote attestation.
+
+
+\section{Target-system Classification ({\?{RQ}}3)}\xlabel{sec:result_rq3}
+
+
+
+This section presents the framework implemented in this paper for classifying vulnerabilities based on the affected target-system categories within update-related vulnerabilities and overall for answering \textbf{RQ3}.
+
+
+\subsection{Rule-based Approach }
+
+
+As a first step, we developed a rule-based approach designed to categorize vulnerable target-systems into six predefined classes. 
+
+\tabref{tab:system_classification} provides an excerpt of representative systems associated with software and firmware update vulnerabilities.
+
+
+Initially, the rule-based approach relies solely on the textual descriptions extracted from disclosed vulnerabilities.
+However, this approach often results in a significant number of vulnerabilities being classified as \texttt{Other}, due to the absence of distinctive keywords in their descriptions.
+To address this limitation, we extended the framework to also consider vendor names and product metadata, which improved the accuracy and contextual understanding of the classification.
+
+
+ \xref{fig:rb_description} illustrates the rule-based classification results. The left side of the figure shows the results obtained using only textual descriptions, while the right side presents the improved results after incorporating vendor and product metadata. This combined approach, leveraging descriptions together with vendor and product information, enhances the rule-based method by correctly labeling classes and reducing bias toward the \texttt{Other} category.
+
+
+
+
+
+ \xref{fig:target-system_overlap} presents a heatmap illustrating the overlap of the Top 10 CWE categories across five target-system classes. The results reveal notable differences in weakness distributions among system types. For instance, CWE-347 (Improper Verification of Cryptographic Signature) shows the highest overlap with 27 occurrences, and is particularly prominent in PC systems (13 instances), followed by Enterprise environments (7), Home systems (4), and SCADA systems (3).
+The next most common weakness is CWE-345 (Insufficient Verification of Data Authenticity) with 16 occurrences, followed by CWE-306 (Missing Authentication for Critical Function) with 13 overlaps.
+
+These findings indicate that most vulnerable target systems are associated with authentication-related weaknesses (ARW), with the exception of the \texttt{Mobile} class.
+
+
+
+\begin{figure}
+\caption{\xlabel{fig:target-system_overlap}Top 10 Overlap CWE  across Target-system Classes.}
+\includegraphics{gr10}
+\end{figure}
+
+\begin{table*}
+\caption{\xlabel{tab:system_classification}Example of classification.}
+\begin{tabular}{LP{250pt}LL}
+\beginthead
+ {Class} & {{Description}} & { {Vendor} } & { {Product} }  \\ 
+\endthead
+   Home &   An exploitable firmware downgrade vulnerability exists in the firmware update functionality of Yi Home Camera ... CVE-2018-3891& Unknown
+     & YiTechnology    \\ \hline
+
+
+    SCADA &  A vulnerability exists in Schneider Electric's Modicon
+ Quantum ... to upgrade the firmware ... CVE-2018-7240 & Schneider
+     & Modicon Quantum    \\ \hline
+
+
+    Enterprise &   IBM Security Secret Server 10.7 processes patches, image backups and other updates  ...  CVE-2019-4640
+ & IBM
+     & Security Secret Server    \\ \hline
+
+
+    Mobile &   A elevation of privilege vulnerability in  Android system OTA updates ... CVE-2017-13265
+ & Google Inc.
+     & Android    \\ \hline
+
+
+    PC &  An elevation of privilege vulnerability exists in the  Microsoft Windows Update... CVE-2020-1014 & Microsoft
+     & Windows    \\ \hline
+
+    
+    Other &   ALTOOLS update service 18.1 and earlier versions contains a local privilege escalation ...  CVE-2019-12808   
+ & ESTSOFT
+     & ALTOOLS Update Service        
+\botline
+\end{tabular}
+\end{table*}
+
+
+\begin{figure*}[,abovefloat=18pt,belowfloat=6pt]
+\caption{\xlabel{fig:rb_description}Target-system classification  with Rule-based approach  using vulnerability description, Vendor, and Product metadata.}
+\includegraphics{gr11}
+\end{figure*}
+
+
+\section{Recommendations ({\?{RQ}}4)}\xlabel{sec:result_rq4}
+
+This section presents a set of recommendations aimed at mitigating update-related weaknesses. 
+We further map these recommendations to the identified weaknesses, thereby addressing \textbf{RQ4}.
+
+
+\subsection{Mitigation Recommendations }
+
+
+
+
+
+
+Taken together, the Top~10 weaknesses account for 37.38\% (cf. \tabref{tab:cwe_update_vs_overall}) of all reported update-related vulnerabilities with associated CWE information. 
+Despite the likely under-reporting of vulnerabilities and the absence of CWE classifications for a large portion of CVEs (cf. \xref{subsec:limitations}), this figure suggests that addressing these weaknesses could substantially improve the security of update mechanisms.
+
+
+
+
+
+Based on this observation, we propose  six generic mitigation recommendations that can serve as a practical checklist when designing, implementing, or deploying software updates. 
+These recommendations are derived from two primary sources: (i) MITRE's recommended mitigations and (ii) techniques and solutions described in the scientific literature.
+
+
+
+
+MITRE provides mitigation guidance for most CWEs; however, these recommendations vary in specificity and relevance to update processes. For each of the Top~10 weaknesses, we examined the corresponding MITRE mitigations and evaluated their suitability for inclusion in the proposed update-related mitigations.
+The selection was guided by three criteria: 
+(i) the mitigation must be directly relevant to update-related vulnerabilities to avoid overly generic security advice, 
+(ii) it must be sufficiently concrete to support practical implementation, and 
+(iii) it should have a potentially strong impact on mitigating at least one identified weakness.
+
+
+
+The analysis in this paper resulted in four mitigation recommendations (R1--R4). 
+In addition, we examined the scientific literature on secure software updates to identify gaps not fully addressed by MITRE's guidance, leading to two additional recommendations (R5--R6). 
+We do not claim that this list is exhaustive; other complementary mitigation strategies may also be relevant.
+Below, we present the six mitigation recommendations (R1--R6) derived from MITRE guidance and prior research.
+
+
+
+
+ 
+
+\cvpt\textbf{R1: Automated Static Analysis (ASA):}
+ASA analyzes binary code before execution on the device. 
+According to MITRE, ASA typically involves constructing a control-flow graph and identifying violated paths between input sources and sensitive sinks. 
+In the context of software updates, ASA can help detect coding errors, logic
+flaws, and potential runtime issues in update components~\citep{4815346}. 
+Automated dynamic analysis has also been shown to be effective for firmware
+analysis~\citep{chen2016towards}. Combining static and dynamic techniques can
+further improve completeness and soundness~\citep{294541}.
+
+
+
+ 
+
+\cvpt\textbf{R2: Sandbox Environment:}
+Sandboxing isolates potentially unsafe code by executing it within a restricted environment, thereby preventing malicious behavior from affecting other applications, system resources, or the host operating system. 
+In update processes, deploying updates within a sandbox or jail environment
+allows the system to assess update behavior before full deployment, enforcing
+separation from the live environment~\citep{LIU2022102613}. However, the
+effectiveness of this mitigation depends on the sandbox's isolation guarantees
+and may primarily limit the scope rather than fully prevent attacks.
+
+
+
+
+
+
+
+
+
+
+
+
+
+\cvpt\textbf{R3: Input Validation:} 
+Assuming all inputs to be potentially malicious, input validation enforces strict constraints and rejects data that does not conform to expected formats or limits. 
+In update mechanisms, this includes validating all inputs that affect raw update data and metadata, such as file formats, sizes, string lengths, and numeric parameters, to ensure compliance with device specifications.
+
+Although conceptually straightforward, robust input validation becomes challenging when handling complex data structures. 
+If input validation is not implemented, software developers will face even more
+challenges managing security update procedures~\citep{koien2023call}. 
+
+
+
+
+
+ 
+
+\cvpt\textbf{R4: Environment Hardening:} 
+Environment hardening focuses on reducing the attack surface by limiting the privileges available to processes and code. In the context of updates, this involves executing update components with the minimum privileges required, such as restricting access to sensitive directories or hard-coded file paths associated with update content.
+
+ 
+
+\cvpt\textbf{R5: Remote Attestation:}  
+Remote attestation is a security mechanism in which a trusted verifier assesses
+the trustworthiness of another device (the prover) by validating its state
+through cryptographic
+evidence~\citep{10.1145/3627106.3627202,10.1145/3579988.3585056}. This
+technique is widely used in complex, decentralized
+systems~\citep{10.1145/3327961.3329529}. 
+Of particular relevance to this work, remote attestation has been integrated
+into secure software update mechanisms for embedded
+systems~\citep{10.1007/s10207-026-01233-1}, connected vehicles, and protections
+against memory-related attacks in firmware, software, and cloud environments.
+
+
+
+
+
+
+
+
+ 
+
+\cvpt\textbf{R6: Update Framework:}  
+Dedicated update frameworks are designed to deliver software and firmware updates in a secure and reliable manner. 
+A well-known example is \texttt{The Update Framework (TUF)}, which has received extensive academic and industrial attention and can be integrated into a wide range of update systems. 
+TUF provides resilience even when parts of the system are compromised.
+\texttt{Uptane}~\citep{10.1145/3678890.3678927}, an extension of TUF tailored
+for the automotive domain, further integrates update verification with remote
+attestation.
+Another example is the \texttt{SWUpdate} framework for Linux-based embedded systems.
+Overall, update frameworks offer an effective means of mitigating a broad range of update-related weaknesses.
+
+
+
+
+  
+
+\stmdocstextcolor{blue}{Note that target-system classes affect how the six recommendations should be prioritized across deployment environments. Although the recommendations are broadly applicable, OT systems such as SCADA may favor lightweight mitigations (R4, R5), whereas Enterprise and PC environments can more readily adopt update frameworks (R6). This prioritization is supported by the class-specific findings in  \xref{sec:result_rq3}, especially the distinct SCADA profile, in which CWE-823 is more prevalent than the authentication-related weaknesses that dominate the other classes.
+}
+
+
+\subsection{Mapping Recommendations to Weaknesses }
+
+
+
+After defining the six mitigation recommendations, we map each recommendation to the weaknesses it addresses, resulting in a recommendation matrix. 
+To express the potential effectiveness of each mitigation, we draw on MITRE's
+prevention and detection effectiveness ratings~\citep{CWE_Schema}, which
+classify (\texttt{Effectiveness \ubrk Enumeration}) \textbf{prevention effectiveness}
+as high, moderate, limited, defense in depth, incidental, or discouraged, and
+(\texttt{Detection \ubrk EffectivenessEnumeration}) \textbf{detection effectiveness}
+as high, moderate, SOAR partial, opportunistic, limited, or none.
+
+
+
+
+Due to the limited availability of empirical data needed for a fine-grained assessment, we adopt a coarse-grained classification scheme. 
+In our matrix, a mitigation is  labeled as \isrc{\fboxsep0.8pt\colorbox{green!50}{\emph{Prevents (P)}}} and \ubrk  \isrc{\fboxsep0.8pt\colorbox{green!50}{\emph{Partially Prevents (PP)}}}
+when there is a clear indication of its effectiveness against a given weakness, and when only partial or limited effectiveness is supported, respectively, as a means of \textbf{prevention}.
+%\QUERY[5]
+Similarly,  a mitigation is labeled as  \isrc{\fboxsep0.8pt\colorbox{yellow!50}{\emph{Detects (D)}}} and \isrc{\fboxsep0.8pt\colorbox{yellow!50}{\emph{Partially Detects (PD)}}} when there is a clear indication of its effectiveness against a given weakness, and when only partial or limited effectiveness is supported, respectively, as a means of \textbf{detection}.
+If no evidence is available to suggest effectiveness, the corresponding entry is left blank.
+
+
+
+
+
+
+ \tabref{tab:CWE_RM} presents the mapping between update-related weaknesses and the mitigation recommendations, based on their relevance within our curated dataset. 
+A single asterisk (*) indicates that the mitigation is explicitly recommended by MITRE or the scientific literature, but without a specified effectiveness rating. 
+A double asterisk (**) denotes that both the recommendation and its effectiveness rating are explicitly provided by the source.
+Below, we justify our effectiveness ratings for those mitigations, weakness pairs that are not explicitly rated by MITRE (i.e.,~none-double asterisk),  and the two recommendations (i.e.,~R5 and R6) we derived from the scientific literature.
+
+
+
+
+
+
+\cvpt\textbf{Environment hardening (R4)} can mitigate path-related weaknesses (PRW),
+R4 $\times$ PRW $=$ \isrc{\fboxsep0.8pt\colorbox{green!50}{(PP$^{*}$)}},  as highlighted by MITRE.\footnote{(R4 $\times$ PRW):  \myehost{https://cwe.mitre.org/data/definitions/22.html}.}   
+However, we classify this mitigation as partial prevention, since restricting privileges to specific directories or paths does not fully eliminate all attack vectors. In practice, attackers may still manipulate file paths to escape hardened directories and bypass protection mechanisms.
+
+
+
+For example, an attacker may supply crafted path inputs such as \texttt{..\%2f} or \texttt{\%2e\%2e/}, which both resolve to \texttt{../}, in an attempt to traverse directories or access the root filesystem. This is particularly relevant when access to local update paths does not require administrative privileges.
+
+
+
+
+
+
+  
+
+\cvpt\textbf{Remote attestation (R5)} can detect malicious activities for \ubrk  authentication-related weaknesses (ARW): 
+R5 $\times$ ARW $=$ \isrc{\fboxsep0.8pt\colorbox{yellow!50}{(D)}}, 
+as in~\citet{10.1145/3664476.3664485} and \citet{KHURSHID2023102952}, including malicious
+user input~\citep{242026}, by observing system state changes, log events, or
+anomalous input activity. 
+Its effectiveness in this regard is enhanced when combined with robust input validation mechanisms (R3), leading to also mitigating input-related weaknesses (IRW), R5 $\times$ IRW $=$ \isrc{\fboxsep0.8pt\colorbox{yellow!50}{(D)}}.
+It can further mitigate authorization-related weaknesses (AuzRW) R5 $\times$ AuzRW $=$ \isrc{\fboxsep0.8pt\colorbox{yellow!50}{(D)}}, 
+when combined with TPM 2.0 and Enhanced
+Authorization  \citep{10.1145/3627106.3627202}.
+
+
+
+
+\cvpt\textbf{Remote attestation (R5)}
+can also partially detect malicious behavior related to \textbf{path} or \textbf{directory} manipulation (PRW), 
+R5 $\times$ PRW $=$ \isrc{\fboxsep0.8pt\colorbox{yellow!50}{(PD)}}~\citep{242026}, 
+and the use of invalid or untrusted certificates~\citep{KHURSHID2023102952} by
+verifying the authenticity of the device certificate against a known certified
+\textbf{certificate} (CRW),
+R5 $\times$ CRW $=$ \isrc{\fboxsep0.8pt\colorbox{yellow!50}{(PD)}}.
+However, most existing attestation mechanisms are largely static and may not detect violations that occur dynamically during the update process.
+
+
+
+
+
+
+
+
+\cvpt\textbf{Update Framework (R6)}
+can effectively prevent authentication-related weaknesses (ARW),
+R6 $\times$ ARW $=$ \isrc{\fboxsep0.8pt\colorbox{green!50}{(P)}}, as they are
+specifically designed to ensure the authenticity and integrity of update
+artifacts~\citep{10.1145/3678890.3678927}.
+
+ R6 $\times$ IRW $=$ \isrc{\fboxsep0.8pt\colorbox{green!50}{(PP$^{*}$)}},
+R6 $\times$ AuzRW $=$ \isrc{\fboxsep0.8pt\colorbox{green!50}{(PP)}},
+R6 $\times$ PRW $=$ \isrc{\fboxsep0.8pt\colorbox{green!50}{(PP)}}:
+The use of a dedicated update framework can also partially prevent
+input-related
+weaknesses\footnote{(R6 $\times$ IRW): \myehost{https://cwe.mitre.org/data/definitions/20.html}.}~\citep{10.1145/3678890.3678927},
+especially if combined with R3.  
+An update framework can also be used for authorization, particularly in
+establishing trust in IoT devices~\citep{10633309}.
+Finally, it can also partially prevent path-related and directory
+weaknesses~\citep{10.1145/3678890.3678927}.
+
+\begin{table*}[hline,belowfloat=20pt]
+\caption{\xlabel{tab:CWE_RM}Recommendation matrix for Mitigation of Update-related Weaknesses:  
+ARW (Authentication-related CWEs),
+IRW (Input-related  CWEs),  
+AuzRW (Authorization-related  CWEs),
+PRW (Path-related CWEs),  
+CRW  (Certificate-related CWEs).}
+\bstmfloatsrc
+\begin{fsrc}
+\tblfont
+\begin{tabular*}{195pt}{l|l|l|l|l|l|l}
+\toprule
+%\hline
+    %\addlinespace[2ex]
+\textbf{Weakness}& \textbf{R1} &  \textbf{R2} &  \textbf{R3} &  \textbf{R4} &  \textbf{R5}&  \textbf{R6}\\ \midrule
+
+ARW & D$^{**}$ \cellcolor{yellow!50} &PP$^{**}$ \cellcolor{green!50} &  & PP$^{**}$ \cellcolor{green!50} &  D \cellcolor{yellow!50}  &   P \cellcolor{green!50} \\  \hline
+IRW & D$^{**}$ \cellcolor{yellow!50} & & P$^{**}$ \cellcolor{green!50} &  &    D \cellcolor{yellow!50} &  PP$^{*}$ \cellcolor{green!50}\\ \hline
+AuzRW   & D$^{**}$ \cellcolor{yellow!50} & PP$^{**}$ \cellcolor{green!50} &   &   & D \cellcolor{yellow!50}  &    PP \cellcolor{green!50} \\  \hline
+PRW   && PP$^{**}$ \cellcolor{green!50} &  & PP$^*$ \cellcolor{green!50} &  PD \cellcolor{yellow!50}& PP \cellcolor{green!50}    \\  \hline
+CRW & PD$^{**}$ \cellcolor{yellow!50} & && &    PD \cellcolor{yellow!50} & \\ 
+\bottomrule
+\end{tabular*}
+\end{fsrc}
+\estmfloatsrc
+
+\end{table*}
+
+
+\subsection{Most Effective Recommendations}\xlabel{subsec:rec_effectiveness}
+
+As shown in \tabref{tab:CWE_RM}, \textbf{Update Framework (R6)} and \textbf{Automated Static Analysis (R1)} together address most of the update-related weaknesses and should be prioritized.
+
+
+
+\cvpt\textbf{Prevention:}
+\textbf{R6} offers the broadest preventive coverage, addressing four of the five categories (ARW, IRW, AuzRW, PRW).
+\textbf{R2 (Sandbox)} ranks second with partial prevention across three categories (ARW, AuzRW, PRW), followed by \textbf{R4 (Environment Hardening)}, which partially prevents two (ARW, PRW).
+
+
+
+\cvpt\textbf{Detection:}
+\textbf{R1 (ASA)} detects four categories (ARW, IRW, AuzRW, CRW), while \textbf{R5 (Remote Attestation)}  covers all five, including path-related weaknesses (PRW).
+
+
+\section{Discussion, Limitations, \& Future Work }\xlabel{sec:limitations_discussion}
+In this section, we discuss the results obtained from our analysis and outline the main limitations and challenges of our study. 
+We also identify directions for future research.
+
+
+\subsection{Discussion}\xlabel{sec:discussion}
+
+
+
+
+
+
+Keeping computing systems up to date remains challenging, particularly because many systems were originally developed with limited emphasis on cybersecurity and without update security as a primary design consideration. 
+This challenge is further amplified in cyber--physical systems (CPS), where applications often operate in real-time environments that require strict timing guarantees and high availability, making updates both complex and potentially risky.
+
+
+
+Our empirical analysis shows that a wide range of systems can be affected during the update process, including SCADA-related components such as Human--Machine Interfaces (HMI) (\texttt{CVE-2021-37160}), Remote Terminal Units (RTU) (\texttt{CVE-2019-14926}), and healthcare systems such as ApexPro Telemetry (\texttt{CVE-2020-6965}). 
+Moreover, even when devices support updates, the mechanisms used to distribute and apply these updates are frequently vulnerable to exploitation.
+
+
+
+
+
+
+
+
+
+
+The results further indicate that update mechanisms are often exploitable locally and exhibit relatively low barriers to exploitation. 
+Frequent local exploitability combined with little or no user interaction can enable attackers to compromise update processes efficiently and at scale, even though privilege requirements are broadly similar to those in the overall vulnerability set. 
+While the Scope metric value  Changed for CVSS  (compared to the Unchanged category), is less common in update-related vulnerabilities, any such exploitation can have severe consequences due to the inherently trusted role of update mechanisms within a system.
+
+
+
+
+
+
+
+In addition, update-related vulnerabilities tend to have disproportionately severe impacts on confidentiality, integrity, and availability.
+Unlike general vulnerabilities, which span a wide range of impact levels, update-related flaws often result in high-impact consequences. 
+These findings reinforce the need to treat update-related vulnerabilities as a distinct and high-priority class within vulnerability management and risk assessment frameworks.
+
+
+
+
+
+The target-system approach adds an important contextual dimension to the findings of this paper. 
+While the analyses in \textbf{RQ1} and \textbf{RQ2} characterize update-related vulnerabilities in terms of exploitability, impact, severity, and underlying weakness classes, the rule-based approach introduced in \textbf{RQ3} helps classify which kinds of systems are affected.
+
+
+
+We show that most of the target-system classes are dominated by  ARW (Authentication-related CWEs).
+However, the most prevalent weakness in the \texttt{SCADA} class is CWE-823 (Use of Out-of-range Pointer Offset) as shown in  \xref{fig:target-system_overlap}.
+Since this weakness does not appear among the overall Top 10 update-related weaknesses, it suggests that SCADA systems exhibit distinct vulnerability characteristics and therefore require different mitigation recommendations.
+
+More broadly, these findings highlight the role of update mechanisms as a supply-chain risk. 
+An update channel that is compromised, whether through weak authentication,
+insufficient integrity verification, or insecure delivery, effectively converts
+a trusted maintenance pathway into an attack vector with system-wide
+reach~\citep{268927}. 
+This perspective aligns with supply-chain security frameworks such as NIST SP
+800-161~\citep{NIST-SP800-161r1}, which emphasize the integrity of software
+components and updates, and highlight risks arising from vulnerable or tampered
+software artifacts throughout the supply chain.
+Our empirical results reinforce this position: the disproportionate severity
+and low exploitation barriers observed for update-related vulnerabilities
+suggest that risk assessment models should weight update-mechanism flaws
+accordingly~\citep{9780011,10.1007/978-3-032-02504-3_29}, rather than treating
+them on par with general application-level vulnerabilities.
+
+
+\subsection{Limitations}\xlabel{subsec:limitations}
+The limited availability of CVSS metrics constrained our ability to assess the impact of both update-related and overall vulnerabilities. As this study relies on publicly available CVE data, it inherits a few limitations:
+
+
+
+
+
+
+\begin{itemize}
+    \item
+    \textbf{CVSS absence:}
+    Out of the 892 update-related vulnerabilities, %the cweId tag is available for only 505 files,
+    only 559 have files with CVSS metrics,
+    while the 243,610  overall vulnerabilities have only 147,871 files with CVSS metrics, 
+    resulting in missing 37.3\% and 39.3\% respectively as shown in  \xref{fig:missing_cvss}.
+    
+    \item \textbf{CWE absence:} 
+    Out of the 892 update-related vulnerabilities, the cweId tag is available for only 505 files,
+    while the  243,610  overall vulnerabilities have only 126,190 files with the cweId tag, 
+    resulting in missing 43.4\% and 48.2\% respectively as shown in  \xref{fig:missing_cwe}.
+
+
+    \item \textbf{Erroneous classification:}
+    Some CVEs appear to be misclassified. For example, \texttt{CVE-2021-25437} is labeled as Improper Input Validation (CWE-20), although its description suggests it more closely aligns with Improper Access Control (CWE-284).
+
+
+    
+    \item \textbf{CWE abstraction:}  
+    Several CWEs are defined at a high level of abstraction, resulting in descriptions that are generic and applicable across many contexts.
+
+    \item \textbf{Keyword-based false negatives:}
+    Our retrieval relies on keyword matching over free-text CVE descriptions.
+    Vulnerabilities that use different or non-standard terminology in their
+  descriptions may have been missed; this is an inherent
+  limitation of keyword-based search over free-text
+  descriptions~\citep{9723604}.
+
+    
+
+\end{itemize}
+
+
+These limitations are not unique to this study and have been reported in prior
+research relying on publicly disclosed vulnerability
+data~\citep{280002,10.1007/978-3-031-62139-0_9,10.1145/3634737.3657012}. 
+
+
+We also encountered practical challenges when extracting CWE identifiers (cweId), as their locations within CVE records vary (e.g.,~under \texttt{containers.cna} or \texttt{containers.adp}), which complicates code implementation in our experiments.
+
+
+
+
+
+
+
+
+
+
+The rule-based approach remains prone to error or bias toward the \texttt{Other} class, even after using the vendor and product metadata.
+For example, in \texttt{CVE-2022-30262}, which states that \texttt{``The Emerson ControlWave `Next Generation' RTUs through 2022-05-02 mishandle firmware integrity...''}, the rule-based classifier still assigns this vulnerability to the \texttt{Other} class, indicating room for further improvement.
+
+
+
+
+
+Despite these limitations and challenges, our findings provide an empirical analysis of update-related vulnerabilities, identify their disproportionate severity and exploitability relative to general vulnerabilities, classify the target systems they affect, and inform the prioritization of mitigation strategies to secure update mechanisms.
+
+
+
+%%
+%%-------------------------------Author Instruction------------------------------%%
+%%  During production stage we have merged the below subfigures into a single    %%
+%%  figure for easier handling. If you want to update the figure, please upload  %%
+%%  a composite figure of all the subfigures including the replaced subfigure.   %%
+%%  However, if you still want to upload them as subfigures, then you may need   %%
+%%  to upload the rest of the figure parts as well. Filenames should be same as  %%
+%%  that we have mentioned in the \includegraphics{} commands. If you are        %%
+%%  uploading subfigures, please do not forget to comment out the command        %%
+%%  \nosubfloat which is given right at the top of this environment.             %%
+%%
+
+\begin{figure}
+\caption{\xlabel{fig:missing_cvss_cwe}Missing CVSS metrics and CWE tag percentages (in red) for update-related and overall vulnerabilities. \uscoltext}
+    \subfloat[Missing CVSS Metrics Percentage.]{\includegraphics{gr12a}\xlabel{fig:missing_cvss}}
+\subfloat[Missing CWE Tag Percentage.]{\includegraphics{gr12b}\xlabel{fig:missing_cwe}}
+\end{figure}
+
+
+
+
+
+\subsection{Future Work}
+
+The limitations discussed in this paper motivate the following directions for future research.
+\textbf{First}, vulnerability retrieval and query generation were conducted using a semi-automated process. 
+Although the resulting dataset was manually curated to improve accuracy and relevance, some false positives may still arise due to keyword overlap between update-related and unrelated vulnerabilities. 
+Future work could therefore investigate fully automated retrieval and filtering pipelines that reduce manual effort while maintaining dataset quality.
+
+\textbf{Second}, the absence, incompleteness, and inconsistency of structured information in CVE records remain a challenge for large-scale automated analysis. 
+Future work could explore more systematic methods for handling missing fields, resolving abstraction issues, and improving the rule-based approach developed in this study.
+
+\textbf{Third}, update-related vulnerabilities differ in their long-term security implications: some are eventually mitigated through subsequent patches, whereas others remain unresolved because affected devices or software have reached end-of-life. 
+A comparative analysis of these two scenarios would provide valuable insight into the lasting risk posed by update-related vulnerabilities.
+
+\textbf{Fourth}, limitations in CVSS scoring affect the assessment of impact and severity (cf. \xref{subsec:limitations}). 
+Prior work has questioned the empirical grounding of CVSS~\citep{9382369},
+proposed alternative weighting schemes~\citep{10.1145/2491845.2491871}, and
+introduced new vulnerability scoring models~\citep{9382369,10271793,280002}. 
+ \textbf{Finally}, the rule-based approach for target-system classification (cf. \xref{sec:result_rq3}) is intended as a baseline for exploratory labeling, not a fully generalizable solution. While it offers interpretability, it is limited in its ability to generalize to previously unseen terminology. Future work could therefore apply natural language processing techniques or machine learning to extend this approach.
+
+
+\section{Conclusion}\xlabel{sec:conclusion}
+
+
+Software and firmware update mechanisms are fundamental to the security and reliability of modern computing systems, yet they also constitute a critical attack surface. 
+This study presents an empirical analysis designed to investigate the landscape of update-related vulnerabilities across a decade of disclosed vulnerabilities, addressing the gap between the importance of secure updates and the actual security posture of update mechanisms.
+Our analysis demonstrates that update-related vulnerabilities are disproportionately severe compared with the broader vulnerability population. 
+They more frequently result in high-impact compromises of confidentiality, integrity, and availability, and are commonly exploitable via local access with minimal user interaction and low privilege requirements. 
+We further analyze the underlying weaknesses to identify their root causes, finding that authentication and authorization flaws, improper input validation, and path- and certificate-related weaknesses are the most prevalent. 
+In addition, we introduce a rule-based approach that uses vulnerability descriptions together with vendor and product metadata to categorize vulnerable target-system classes, thereby adding deployment context that is otherwise absent from raw CVE records. 
+This classification reveals distinct vulnerability characteristics across system types: most notably, SCADA systems are uniquely dominated by a memory-safety weakness, whereas the remaining classes are dominated by authentication-related weaknesses, a difference that would directly inform the prioritization of mitigations for OT and IT environments. 
+Building on these findings, we derive six actionable recommendations ranging from implementing robust input validation and remote attestation to adopting dedicated secure update frameworks aimed at mitigating common weaknesses and improving the resilience of update mechanisms.
+
+
+\printauthorcredits
+
+\conflictofinterest
+
+
+\DoCIyes{Ahmad B. Usman reports financial support was provided by the Wallenberg AI,
+Autonomous Systems and Software Program (WASP) funded by the Knut and Alice
+Wallenberg Foundation. Mikael Asplund reports financial support was provided by
+the Swedish Foundation for Strategic Research (SSF). If there are other authors, they
+declare that they have no known competing financial interests or personal
+relationships that could have appeared to influence the work reported in this paper.}
+
+
+
+
+\ackheads
+ 
+
+This work was partially supported by the Wallenberg AI, \ubrk  Autonomous Systems and Software Program (WASP) funded by the \grantsponsor{Knut and Alice Wallenberg Foundation\gcny*{Sweden}}[http://dx.doi.org/10.13039/501100004063].
+The second author was partly financed by the \grantsponsor{Swedish Foundation for
+Strategic Research (SSF)}, project FUS21-0033 (ASTECC).
+%\QUERY[6]
+\back{}
+
+\bibliographystyle{stm-xml-sort-names-fnm-abre-v1}
+
+\nocite{*}
+
+\bibliography{\jobname.bib}
+
+\begin{bibwrite}{\jobname.bib}
+
+@preamble{"\tfbibfldoff[issn,isbn]"}
+
+@inbook{10633309,
+aetag={ \advance\baselineskip0.7pt},
+SerialNo={1},
+author={Aoki, Nobuo and Takefusa, Atsuko and Ishikawa, Yutaka and Ono, Yasushi
+  and Sakane, Eisaku and Aida, Kento},
+ year={2024},
+title={{ZT}-{OTA} Update Framework for {IoT} Devices Toward Zero Trust {IoT}},
+booktitle={2024 IEEE 48th Annual Computers, Software, and Applications   Conference},
+ctitle={COMPSAC},
+  pages={2195--2202},
+doi={10.1109/COMPSAC61105.2024.00352},
+ keywords={Wireless networks;Software;Software reliability;System software;Zero
+  Trust;Internet of Things;Servers;Internet of Things;third-party
+  assurance;soft-ware reliability;over-the-air updates;software updates;TUF},
+}
+
+
+@article{8493602,
+SerialNo={2},
+author={Asokan, N. and Nyman, Thomas and Rattanavipanon, Norrathep and
+  Sadeghi, Ahmad-Reza and Tsudik, Gene},
+ year={2018},
+title={{\?{ASSURED}}: \?{A}rchitecture for Secure Software Update of Realistic Embedded
+  Devices},
+journal={\rvtiopIEEETransComputAidedDesIntegrCircuitsSyst},
+doi={10.1109/TCAD.2018.2858422},
+ keywords={Software;Metadata;Hardware;Cryptography;Access control;Computer
+  architecture;Embedded systems;Computer security;Internet of Things;Computer
+  security;embedded software;embedded systems;Internet of Things (IoT)},
+}
+
+
+@inbook{268927,
+SerialNo={3},
+author={Anthony Bellissimo and John Burgess and Kevin Fu},
+ year={2006},
+title={Secure Software Updates: \?{D}isappointments and New Challenges},
+booktitle={First USENIX Workshop on Hot Topics in Security (HotSec 06)},
+ orgname={USENIX Association},
+}
+
+
+@inbook{10.1145/3634737.3657012,
+SerialNo={4},
+author={Blessing, Jenny and Specter, Michael A. and Weitzner, Daniel J.},
+ year={2024},
+title={Cryptography in the Wild: \?{A}n Empirical Analysis of Vulnerabilities in
+  Cryptographic Libraries},
+booktitle={Proceedings of the 19th ACM Asia Conference on Computer and   Communications Security},
+ctitle={ASIA CCS '24},
+ orgname={Association for Computing Machinery},
+doi={10.1145/3634737.3657012},
+ isbn={9798400704826},
+ keywords={cryptography, vulnerabilities, complexity, cryptography libraries},
+}
+
+
+@inbook{10.1007/978-3-030-48256-5_9,
+SerialNo={5},
+author={Blinowski, Grzegorz J. and Piotrowski, Pawe{\l}},
+ year={2020},
+title={{\?{CVE}} Based Classification of Vulnerable {\?{IoT}} Systems},
+booktitle={Theory and Applications of Dependable Computer Systems},
+  pages={82--93},
+ orgname={Springer International Publishing},
+ city = {Cham},
+ editor={Zamojski, Wojciech and Mazurkiewicz, Jacek and Sugier, Jaros{\l}aw and
+  Walkowiak, Tomasz and Kacprzyk, Janusz},
+ isbn={978-3-030-48256-5},
+
+}
+
+
+@report{NIST-SP800-161r1,
+SerialNo={6},
+author={Boyens, Jon and Smith, Angela and Bartol, Nadya and Winkler, Kris and
+  Holbrook, Alex and Fallon, Matthew},
+ year={2022},
+booktitle={Cybersecurity Supply Chain Risk Management Practices for Systems and
+  Organizations},
+booksubtitle={Tech. Rep. NIST SP 800-161 Rev. 1},
+ institution={National Institute of Standards and Technology},
+doi={10.6028/NIST.SP.800-161r1},
+ post={\myehost{https://csrc.nist.gov/pubs/sp/800/161/r1/final}},
+}
+
+
+@inbook{10.1007/978-3-031-30122-3_25,
+SerialNo={7},
+author={Bradley, Conner and Barrera, David},
+ year={2023},
+title={Towards Characterizing {\?{IoT}} Software Update Practices},
+booktitle={Foundations and Practice of Security},
+ orgname={Springer Nature},
+}
+
+
+@inbook{chen2016towards,
+SerialNo={8},
+author={Chen, Daming D and Woo, Maverick and Brumley, David and Egele,
+  Manuel},
+ year={2016},
+title={Towards automated dynamic analysis for linux-based embedded firmware},
+booktitle={NDSS},
+}
+
+
+@article{10.1109/MSP.2012.113,
+SerialNo={9},
+author={Coppens, Bart and De Sutter, Bjorn and De Bosschere, Koen},
+ year={2013},
+title={Protecting Your Software Updates},
+journal={IEEE {\rvtissnSecur} {\rvtissnPrivacy}},
+ volume={11},
+ number={2},
+  pages={47--54},
+ orgname={IEEE Educational Activities Department},
+ city = {USA},
+doi={10.1109/MSP.2012.113},
+ issn={1540-7993},
+ keywords={Computer security, Privacy, Semantics, Software development,
+  Software reliability, Syntactics, binary code diversity, diffing tools,
+  patch-based attacks, software protection},
+}
+
+
+@inbook{costin2014large,
+SerialNo={10},
+author={Costin, Andrei and Zaddach, Jonas and Francillon, Aur{\'e}lien and
+  Balzarotti, Davide},
+ year={2014},
+title={A Large-scale analysis of the security of embedded firmwares},
+booktitle={23rd USENIX Security Symposium (USENIX Security 14)},
+}
+
+%\QUERY[8]
+@CUSTOMBIB{CVE_Program,
+mypattern={[authors,atitle,midc][booktag,bktitle,yr,endbooktag,bibpages,bibdoi][post,myehost]},
+SerialNo={11},
+author={{CVE Program}, {}},
+year={2026},
+title={Common Vulnerabilities and Exposures (\?{CVE})},
+note={\myehost{https://www.cve.org}. (Accessed 03 January 2026)},
+aetag={ },
+}
+
+
+@CUSTOMBIB{CVE_List_V5,
+mypattern={[authors,atitle,midc][booktag,bktitle,yr,endbooktag,bibpages,bibdoi][post,myehost]},
+SerialNo={12},
+author={{CVE Project}, {}},
+year={2026},
+title={{CVE} List {V5} Repository},
+note={\myehost{https://github.com/CVEProject/cvelistV5}. (Accessed 03 January 2026)},
+}
+
+
+@CUSTOMBIB{CWE_Schema,
+mypattern={[authors,atitle,midc][booktag,bktitle,yr,endbooktag,bibpages,bibdoi][post,myehost]},
+SerialNo={13},
+author={{CWE Program}, {}},
+year={2026},
+title={{CWE} Schema Documentation},
+note={\myehost{https://cwe.mitre.org/documents/schema/index.html}. (Accessed 03 January 2026)},
+}
+
+
+@CUSTOMBIB{CWE_Top25_2023,
+mypattern={[authors,atitle,midc][booktag,bktitle,yr,endbooktag,bibpages,bibdoi][post,myehost]},
+SerialNo={14},
+author={{CWE Program}, {}},
+year={2023},
+title={{CWE} Top 25 Most Dangerous Software Weaknesses},
+note={\myehost{https://cwe.mitre.org/top25/archive/2023/2023\_top25\_list.html}. (Accessed 03 January 2026)},
+}
+
+
+@custombib{FIRST-CVSSv3.1,
+mypattern={[authors,atitle,midc][booktag,bktitle,yr,endbooktag,bibpages,bibdoi][post,myehost]},
+SerialNo={15},
+author={{FIRST}, {}},
+year={2025},
+title={Common Vulnerability Scoring System v3.1: \?{S}pecification Document},
+ post={\xURL \myehost{https://www.first.org/cvss/v3-1/specification-document}. (Accessed 06 January 2025)},
+}
+
+
+@inbook{10.1145/3605770.3625211,
+SerialNo={16},
+author={Froh, Fabian Niklas and Gobbi, Mat{\'\i}as Federico and Kinder,
+  Johannes},
+ year={2023},
+title={Differential Static Analysis for Detecting Malicious Updates to Open
+  Source Packages},
+booktitle={Proceedings of the 2023 Workshop on Software Supply Chain Offensive   Research and Ecosystem Defenses},
+ctitle={SCORED '23},
+  pages={41--49},
+ orgname={Association for Computing Machinery},
+ city = {New York, NY, USA},
+doi={10.1145/3605770.3625211},
+ isbn={9798400702631},
+ keywords={malware, npm, static analysis},
+}
+
+
+@inbook{10190484,
+SerialNo={17},
+author={Ibrahim, Muhammad and Continella, Andrea and Bianchi, Antonio},
+ year={2023},
+title={AoT - Attack on Things: \?{A} security analysis of {\?{IoT}} firmware updates},
+booktitle={2023 IEEE 8th European Symposium on Security and Privacy},
+ctitle={EuroS\&P},
+doi={10.1109/EuroSP57164.2023.00065},
+ keywords={Performance evaluation;Threat modeling;Systematics;Fingerprint
+  recognition;Security;Internet of Things;Object recognition;IoT
+  Security;Firmware Updates;Android Companion Apps;IoT DFU;IoT Firmware
+  Updates},
+}
+
+
+@inbook{10.1145/3327961.3329529,
+SerialNo={18},
+author={Khodari, Mohammed and Rawat, Abhimanyu and Asplund, Mikael and Gurtov,
+  Andrei},
+ year={2019},
+title={Decentralized Firmware Attestation for In-Vehicle Networks},
+booktitle={Proceedings of the 5th on Cyber-Physical System Security Workshop},
+ctitle={CPSS '19},
+ orgname={Association for Computing Machinery},
+doi={10.1145/3327961.3329529},
+ isbn={9781450367875},
+ keywords={integrity, firmware, communication system security, attestation,
+  ECU},
+}
+
+
+@article{KHURSHID2023102952,
+SerialNo={19},
+author={Anum Khurshid and Shahid Raza},
+ year={2023},
+title={{AutoCert}: \?{A}utomated \?{TOCTOU}-secure digital certification for {\?{IoT}} with
+  combined authentication and assurance},
+journal={\rvtiopComputSecur},
+doi={10.1016/j.cose.2022.102952},
+ issn={0167-4048},
+ keywords={IoT Device Security, Certification, Remote Attestation, TPM 2.0,
+  Public Key Infrastructure, X509, Assurance},
+}
+
+
+@article{koien2023call,
+SerialNo={20},
+author={K{\o}ien, Geir M. and {\O}verlier, Lasse},
+ year={2023},
+title={A call for mandatory input validation and fuzz testing},
+journal={\rvtiopWirelPersCommun},
+ orgname={Springer},
+doi={10.1007/s11277-023-10431-2},
+}
+
+
+@inbook{10.1145/3133956.3134072,
+SerialNo={21},
+author={Li, Frank and Paxson, Vern},
+ year={2017},
+title={A Large-Scale Empirical Study of Security Patches},
+booktitle={Proceedings of the 2017 ACM SIGSAC Conference on Computer and   Communications Security},
+ctitle={CCS '17},
+ orgname={Association for Computing Machinery},
+doi={10.1145/3133956.3134072},
+ isbn={9781450349468},
+ keywords={empirical study, patch complexity, security patches,
+  vulnerabilities},
+}
+
+
+@article{LIU2022102613,
+SerialNo={22},
+author={Songsong Liu and Pengbin Feng and Shu Wang and Kun Sun and Jiahao
+  Cao},
+ year={2022},
+title={Enhancing malware analysis sandboxes with emulated user behavior},
+journal={\rvtiopComputSecur},
+doi={10.1016/j.cose.2022.102613},
+ issn={0167-4048},
+ keywords={Malware analysis, Anti-Sandbox technique, System artifacts, User
+  profiling, User behavior emulation},
+}
+
+
+@inbook{10.1145/3678890.3678927,
+SerialNo={23},
+author={Lorch, Robert and Larraz, Daniel and Tinelli, Cesare and Chowdhury,
+  Omar},
+ year={2024},
+title={A Comprehensive, Automated Security Analysis of the Uptane Automotive
+  Over-the-Air Update Framework},
+booktitle={Proceedings of the 27th International Symposium on Research in   Attacks, Intrusions and Defenses},
+ ctitle={RAID '24},
+ orgname={Association for Computing Machinery},
+doi={10.1145/3678890.3678927},
+ isbn={9798400709593},
+ keywords={attacks, automotive security, model checking, protocol analysis,
+  vulnerabilities},
+}
+
+
+@inbook{9723604,
+SerialNo={24},
+author={Luo, Jie and Wang, Jian},
+ year={2021},
+title={Vulnerability Assessment of {\?{IoT}} Devices Through Multi-layer Keyword
+  Matching},
+booktitle={2021 International Conference on Computer, Internet of Things and   Control Engineering},
+ctitle={CITCE},
+  pages={138--143},
+doi={10.1109/CITCE54390.2021.00034},
+ keywords={Deep learning;Software
+  algorithms;Semantics;Cyberspace;Interference;Syntactics;Software;IoT;vulnerability
+  assessment;NLP;multilayer matching},
+}
+
+
+@inbook{10.1145/3560826.3563381,
+SerialNo={25},
+author={Nikbakht Bideh, Pegah and Gehrmann, Christian},
+ year={2022},
+title={RoSym: \?{R}obust Symmetric Key Based {\?{IoT}} Software Upgrade Over-the-Air},
+booktitle={Proceedings of the 4th Workshop on CPS \& IoT Security and   Privacy},
+ctitle={CPSIoTSec '22},
+ orgname={Association for Computing Machinery},
+doi={10.1145/3560826.3563381},
+ isbn={9781450398763},
+ keywords={secure code dissemination, protected software upgrade, over-the-air,
+  internet of things},
+}
+
+
+@inbook{10.1007/978-3-031-62139-0_9,
+SerialNo={26},
+author={Plaka, Roland and Asplund, Mikael and Nadjm-Tehrani, Simin},
+ year={2024},
+title={Vulnerability Analysis of an Electric Vehicle Charging Ecosystem},
+booktitle={Critical Information Infrastructures Security},
+ orgname={Springer Nature Switzerland},
+ isbn={978-3-031-62139-0},
+}
+
+
+@inbook{10.1145/3627106.3627202,
+SerialNo={27},
+author={Plappert, Christian and Fuchs, Andreas},
+ year={2023},
+title={Secure and Lightweight \?{ECU} Attestations for Resilient Over-the-Air
+  Updates in Connected Vehicles},
+booktitle={Proceedings of the 39th Annual Computer Security Applications   Conference},
+ctitle={ACSAC '23},
+  pages={283--297},
+ orgname={Association for Computing Machinery},
+ city = {New York, NY, USA},
+doi={10.1145/3627106.3627202},
+ isbn={9798400708862},
+ keywords={OTA, Trusted Platform Module (TPM) 2.0, UNECE regulations 155 and
+  156, Uptane, automotive software update, connected car, trusted computing},
+}
+
+
+@inbook{10.1145/3560835.3564551,
+SerialNo={28},
+author={Prakash, Vijay and Xie, Sicheng and Huang, Danny Yuxing},
+ year={2022},
+title={Inferring Software Update Practices on Smart Home {\?{IoT}} Devices Through
+  User Agent Analysis},
+booktitle={Proceedings of the 2022 ACM Workshop on Software Supply Chain   Offensive Research and Ecosystem Defenses},
+ctitle={SCORED'22},
+ orgname={Association for Computing Machinery},
+doi={10.1145/3560835.3564551},
+ isbn={9781450398855},
+ keywords={iot, supply chain, updates},
+}
+
+
+@inbook{10271793,
+SerialNo={29},
+author={Seker, Ensar and Meng, Weizhi},
+ year={2023},
+title={{\?{XVRS}}: \?{E}xtended Vulnerability Risk Scoring based on Threat
+  Intelligence},
+booktitle={2023 IEEE International Conference on Metaverse Computing,   Networking and Applications (MetaCom)},
+doi={10.1109/MetaCom57706.2023.00094},
+ keywords={Dark Web;Computer hacking;Social networking
+  (online);Metaverse;Databases;Organizations;Data breach;Threat
+  Intelligence;Risk Analysis;Vulnerability Score;Security Flaw;CVE},
+}
+
+
+@inbook{10.1007/978-3-030-80825-9_11,
+SerialNo={30},
+author={Setayeshfar, Omid and Rhee, Junghwan ``John'' and Kim, Chung Hwan and
+  Lee, Kyu Hyung},
+ year={2021},
+title={Find My Sloths: \?{A}utomated Comparative Analysis of How Real Enterprise
+  Computers Keep Up with the Software Update Races},
+booktitle={Detection of Intrusions and Malware, and Vulnerability Assessment},
+ orgname={Springer International Publishing},
+ isbn={978-3-030-80825-9},
+}
+
+
+@inbook{10.1145/2491845.2491871,
+SerialNo={31},
+author={Spanos, Georgios and Sioziou, Angeliki and Angelis, Lefteris},
+ year={2013},
+title={{\?{WIVSS}}: {A} new methodology for scoring information systems
+  vulnerabilities},
+booktitle={Proceedings of the 17th Panhellenic Conference on Informatics},
+ctitle={PCI '13},
+ orgname={Association for Computing Machinery},
+doi={10.1145/2491845.2491871},
+ isbn={9781450319690},
+ keywords={IT security, vulnerability, vulnerability scoring},
+}
+
+
+@article{9382369,
+SerialNo={32},
+author={Spring, Jonathan and Hatleback, Eric and Householder, Allen and
+  Manion, Art and Shick, Deana},
+ year={2021},
+title={Time to Change the {CVSS}?},
+chsep={\chsep[atitle]{~}},
+journal={IEEE {\rvtissnSecur} {\rvtissnPrivacy}},
+doi={10.1109/MSEC.2020.3044475},
+ keywords={Industries;Privacy;Data security;Government;NIST;Regulation},
+}
+
+
+@article{9780011,
+SerialNo={33},
+author={Tizio, Giorgio Di and Armellini, Michele and Massacci, Fabio},
+ year={2023},
+title={Software Updates Strategies: \?{A} Quantitative Evaluation Against Advanced
+  Persistent Threats},
+journal={\rvtiopIEEETransSoftwEng},
+ number={3},
+doi={10.1109/TSE.2022.3176674},
+ keywords={Software;Delays;Companies;Testing;Measurement;Faces;Terminology;Advanced
+  persistent threats;software vulnerabilities;software updates},
+}
+
+
+@inbook{242026,
+SerialNo={34},
+author={Flavio Toffalini and Eleonora Losiouk and Andrea Biondo and Jianying
+  Zhou and Mauro Conti},
+ year={2019},
+title={{ScaRR}: \?{S}calable Runtime Remote Attestation for Complex Systems},
+booktitle={22nd International Symposium on Research in Attacks, Intrusions and   Defenses},
+ctitle={RAID 2019},
+orgname={USENIX Association},
+city = {Chaoyang District, Beijing},
+isbn={978-1-939133-07-6},
+post={\myehost{https://www.usenix.org/conference/raid2019/presentation/toffalini}},
+}
+
+
+@inbook{8022734,
+SerialNo={35},
+author={Treetippayaruk, Sirikwan and Senivongse, Twittie},
+ year={2017},
+title={Security vulnerability assessment for software version upgrade},
+booktitle={2017 18th IEEE/ACIS International Conference on Software
+  Engineering, Artificial Intelligence, Networking and Parallel/Distributed
+  Computing},
+ctitle={SNPD},
+doi={10.1109/SNPD.2017.8022734},
+ keywords={Measurement;Computer security;Tools;Databases;security
+  vulnerability;CVSS;NVD;security assessment;software upgrade},
+}
+
+
+@inbook{10.1007/978-3-032-02504-3_29,
+SerialNo={36},
+author={Usman, Ahmad B.},
+ year={2026},
+title={On the Inconsistency of Update-Related
+  Vulnerabilities},
+booktitle={Human Aspects of Information Security and Assurance},
+  pages={420--434},
+ orgname={Springer Nature Switzerland},
+ city = {Cham},
+ editor={Furnell, Steven and Clarke, Nathan},
+ isbn={978-3-032-02504-3},
+}
+
+
+@article{10.1007/s10207-026-01233-1,
+SerialNo={37},
+author={Usman, Ahmad B. and Afzal, Zeeshan and Asplund, Mikael},
+ year={2026},
+title={Bridging remote attestation and secure software updates in embedded
+  systems},
+journal={{\rvtissnInternation} {\rvtissnJournal} {\rvtissnInformation} {\rvtissnSecur}},
+ volume={25},
+ number={2},
+  pages={75},
+ orgname={Springer},
+doi={10.1007/s10207-026-01233-1},
+}
+
+
+@inbook{10.1007/978-3-031-92886-4_7,
+SerialNo={38},
+author={Usman, Ahmad B. and Asplund, Mikael},
+ year={2025},
+title={Update at Your Own Risk: \?{A}nalysis
+  and Recommendations for Update-Related
+  Vulnerabilities},
+booktitle={ICT Systems Security and Privacy Protection},
+  pages={97--110},
+ orgname={Springer Nature Switzerland},
+ city = {Cham},
+ editor={Nemec Zlatolas, Lili and Rannenberg, Kai and Welzer, Tatjana and
+  Garcia-Alfaro, Joaquin},
+ isbn={978-3-031-92886-4},
+}
+
+
+@inbook{10.1145/3579988.3585056,
+SerialNo={39},
+author={Usman, Ahmad B. and Cole, Nigel and Asplund, Mikael and Boeira, Felipe
+  and Vestlund, Christian},
+ year={2023},
+title={Remote Attestation Assurance Arguments for Trusted Execution
+  Environments},
+booktitle={Proceedings of the 2023 ACM Workshop on Secure and Trustworthy   Cyber-Physical Systems},
+ctitle={SaT-CPS '23},
+ orgname={Association for Computing Machinery},
+doi={10.1145/3579988.3585056},
+ isbn={9798400701009},
+ keywords={assurance, cps, globalplatform, goal structuring notation, remote
+  attestation, trusted execution environments},
+}
+
+
+@inbook{10.1145/3344948.3344972,
+SerialNo={40},
+author={Villegas, M{\'o}nica M. and Orellana, Cristian and Astudillo,
+  Hern{\'a}n},
+ year={2019},
+title={A study of over-the-air (\?{OTA}) update systems for \?{CPS} and {\?{IoT}} operating
+  systems},
+booktitle={Proceedings of the 13th European Conference on Software   Architecture},
+ctitle={ECSA '19},
+ orgname={Association for Computing Machinery},
+doi={10.1145/3344948.3344972},
+ isbn={9781450371421},
+ keywords={IoT, OTA updates, cyber-physical systems, operating systems},
+}
+
+
+@inbook{4815346,
+SerialNo={41},
+author={Wedyan, Fadi and Alrmuny, Dalal and Bieman, James M.},
+ year={2009},
+title={The Effectiveness of Automated Static Analysis Tools for Fault
+  Detection and Refactoring Prediction},
+booktitle={2009 International Conference on Software Testing Verification and   Validation},
+doi={10.1109/ICST.2009.21},
+ keywords={Fault detection;Software tools;Open source software;Costs;Fault
+  diagnosis;Java;Documentation;Software testing;Computer science;Gas
+  detectors;static analsis tools;defect prediction;refatoring;open source
+  software;coding concerns;anomaly detection;empirical evaluation},
+}
+
+
+@inbook{10.1145/3664476.3664485,
+SerialNo={42},
+author={Wilson, Johannes and Asplund, Mikael and Johansson, Niklas and Boeira,
+  Felipe},
+ year={2024},
+title={Provably Secure Communication Protocols for Remote Attestation},
+booktitle={Proceedings of the 19th International Conference on Availability,   Reliability and Security},
+ctitle={ARES '24},
+ orgname={Association for Computing Machinery},
+doi={10.1145/3664476.3664485},
+ isbn={9798400717185},
+ keywords={Authentication, Formal Protocol Verification, Protocol Attack,
+  Remote Attestation, Security Models, Tamarin Prover},
+}
+
+
+@inbook{280002,
+SerialNo={43},
+author={Qiushi Wu and Yue Xiao and Xiaojing Liao and Kangjie Lu},
+ year={2022},
+title={{OS}-Aware Vulnerability Prioritization via Differential Severity
+  Analysis},
+booktitle={31st USENIX Security Symposium (USENIX Security 22)},
+ orgname={USENIX Association},
+ isbn={978-1-939133-31-1},
+}
+
+
+@inbook{294541,
+SerialNo={44},
+author={Yuhao Wu and Jinwen Wang and Yujie Wang and Shixuan Zhai and Zihan Li
+  and Yi He and Kun Sun and Qi Li and Ning Zhang},
+ year={2024},
+title={Your Firmware Has Arrived: \?{A} Study of Firmware Update Vulnerabilities},
+booktitle={33rd USENIX Security Symposium (USENIX Security 24)},
+ orgname={USENIX Association},
+ isbn={978-1-939133-44-1},
+}
+
+
+
+\end{bibwrite}
+
+
+
+\newbox\uncitedrefsbox
+\setbox\uncitedrefsbox=\vbox{\xref[nosort]{TeXFolio:fig2,TeXFolio:fig4,TeXFolio:fig7,TeXFolio:fig8,TeXFolio:fig12}}
+
+
+%
+
+
+
+
+
+\begin{biography}
+\includepic
+\textbf{Ahmad B. Usman} received the M.Sc. degree in ICT for Internet and Multimedia (MIME) track of CyberSystems from the Department of Information Engineering (DEI) at the University of Padua, Italy, from 2019 to 2021. He is currently pursuing a Ph.D. in Computer Science at Link\"oping University, Sweden, since 2021.% (\myehost{https://ahmadusman.eu}).
+\end{biography}
+
+\xvfill\xeject
+\xpar\cvskip[-23pt] 
+
+\begin{biography}
+\includepic
+\textbf{Mikael Asplund} received the M.Sc. degree in Computer Science and Engineering and the Ph.D. degree in Computer Science from Link\"oping University, Sweden, in 2005 and 2011, respectively. From 2011 to 2012, he was a Research Fellow with Trinity College Dublin, Ireland. 
+He is currently a Senior Associate Professor and Head of the Cybersecurity Division at Link\"oping University, Sweden. His current research interests include security of cyber--physical systems and formally verified security.% (\myehost{https://www.asplund.eu}). 
+\end{biography}
+
+
+ 
+
+
+
+
+
+
+
+
+
+\end{document}
